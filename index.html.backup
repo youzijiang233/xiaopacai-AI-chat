@@ -213,9 +213,6 @@ kbd{background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-
 #stop-icon{display:none}
 #stop-icon.visible{display:inline-block}
 
-/* Plain Text */
-.plain-text{white-space:pre-wrap}
-
 /* Stop Marker */
 .stop-marker{font-size:11px;color:var(--text3);margin-left:8px}
 
@@ -259,7 +256,7 @@ kbd{background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-
     <div class="panel-inner">
 
       <!-- Settings Panel -->
-      <div id="panel-settings" class="active">
+      <div id="panel-settings">
         <div class="panel-header">
           <span class="panel-title">参数配置</span>
           <button class="panel-close" onclick="switchPanel(null)" aria-label="关闭面板">
@@ -536,7 +533,7 @@ mdRenderer.code = function(code, lang) {
 marked.use({ renderer: mdRenderer });
 
 function renderMd(text) {
-  if (!mdEnabled) return `<span class="plain-text">${escapeHtml(text)}</span>`;
+  if (!mdEnabled) return `<span style="white-space:pre-wrap">${escapeHtml(text)}</span>`;
   return marked.parse(text);
 }
 function escapeHtml(t) {
@@ -956,7 +953,7 @@ async function sendMessage() {
   } catch(err) {
     if(err.name==='AbortError') {
       if(fullText) {
-        contentEl.innerHTML = renderMd(fullText) + '<span class="stop-marker">[ 已停止 ]</span>';
+        contentEl.innerHTML = renderMd(fullText) + '<span style="font-size:11px;color:var(--text3);margin-left:8px">[ 已停止 ]</span>';
         currentMessages.push({ role:'assistant', content:fullText });
         saveCurrentConv(); updateStats();
       } else { aiRow.remove(); }
@@ -992,8 +989,8 @@ function setGenerating(on) {
   isGenerating = on;
   const btn=g('send-btn');
   btn.classList.toggle('stop-mode',on);
-  g('send-icon').style.display = on?'none':'';
-  g('stop-icon').style.display = on?'':'none';
+  g('send-icon').classList.toggle('hidden', on);
+  g('stop-icon').classList.toggle('visible', on);
   btn.title = on?'停止生成':'发送 (Ctrl+Enter)';
 }
 
@@ -1044,8 +1041,11 @@ function switchPanel(name) {
     return;
   }
   activePanel=name; panel.classList.remove('hidden');
-  sp.style.display = name==='settings'?'flex':'none';
-  hp.style.display  = name==='history' ?'flex':'none';
+  // 使用类切换代替 style.display
+  sp.classList.remove('active');
+  hp.classList.remove('active');
+  if (name === 'settings') sp.classList.add('active');
+  if (name === 'history') hp.classList.add('active');
   rs.classList.toggle('active',name==='settings');
   rh.classList.toggle('active',name==='history');
   saveSettings();

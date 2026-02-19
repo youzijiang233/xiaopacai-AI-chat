@@ -1,7 +1,85 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, ipcMain, safeStorage } = require('electron');
 const path = require('path');
+const fs = require('fs').promises;
 
 let mainWindow;
+
+// 数据存储目录
+// 开发环境：项目根目录/data
+// 打包后：应用安装目录/data（与 exe 同级）
+const dataDir = app.isPackaged
+  ? path.join(path.dirname(process.execPath), 'data')
+  : path.join(app.getAppPath(), 'data');
+
+// 确保数据目录存在
+async function ensureDataDir() {
+  try {
+    await fs.access(dataDir);
+  } catch {
+    await fs.mkdir(dataDir, { recursive: true });
+  }
+}
+
+// IPC 处理器：加密数据（使用系统级加密）
+ipcMain.handle('encrypt-data', async (event, plaintext) => {
+  try {
+    if (!safeStorage.isEncryptionAvailable()) {
+      return { success: false, error: '系统加密不可用' };
+    }
+    const buffer = safeStorage.encryptString(plaintext);
+    return { success: true, data: buffer.toString('base64') };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// IPC 处理器：解密数据（使用系统级加密）
+ipcMain.handle('decrypt-data', async (event, encrypted) => {
+  try {
+    if (!safeStorage.isEncryptionAvailable()) {
+      return { success: false, error: '系统加密不可用' };
+    }
+    const buffer = Buffer.from(encrypted, 'base64');
+    const plaintext = safeStorage.decryptString(buffer);
+    return { success: true, data: plaintext };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// IPC 处理器：读取数据文件
+ipcMain.handle('read-data', async (event, filename) => {
+  try {
+    const filePath = path.join(dataDir, filename);
+    const data = await fs.readFile(filePath, 'utf-8');
+    return { success: true, data };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// IPC 处理器：写入数据文件
+ipcMain.handle('write-data', async (event, filename, data) => {
+  try {
+    await ensureDataDir();
+    const filePath = path.join(dataDir, filename);
+    await fs.writeFile(filePath, data, 'utf-8');
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// IPC 处理器：检查文件是否存在
+ipcMain.handle('file-exists', async (event, filename) => {
+  try {
+    const filePath = path.join(dataDir, filename);
+    await fs.access(filePath);
+    return { success: true, exists: true };
+  } catch {
+    return { success: true, exists: false };
+  }
+});
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -13,7 +91,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      enableRemoteModule: false
+      enableRemoteModule: false,
+      preload: path.join(__dirname, 'preload.js')
     },
     // icon: path.join(__dirname, 'assets/icon.ico'),  // Uncomment when icon is ready
     title: 'AI Chat',
