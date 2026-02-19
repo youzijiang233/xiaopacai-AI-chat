@@ -2,20 +2,34 @@
 
 ## v1.0.1 (2024-02-19)
 
-### 🔒 安全性改进
+### 🎨 UI 优化和问题修复
 
-- **API Key 加密存储**
-  - 使用 XOR + Base64 加密算法
-  - 自动加密保存的 API Key
-  - 向后兼容旧的明文数据
-  - 添加安全提示 UI："🔒 API Key 已加密存储"
+- **API 配置简化**
+  - 只保留 OpenRouter 和自定义选项
+  - 移除 OpenAI 和 Claude 预设选项
+  - 简化配置流程
+
+- **新建对话按钮优化**
+  - 缩小按钮宽度至 120px
+  - 调整按钮位置至"对话列表"标题右侧
+  - 改进按钮样式为长方形
+
+- **消息显示修复**
+  - 修复用户消息气泡前的多余空行
+  - 修复输入框上下间距不一致问题
+  - 优化 textarea 对齐方式
+
+- **API Key 功能改进**
+  - 保留 API Key 自动保存功能
+  - 添加 API Key 格式验证
+  - 防止非 ASCII 字符导致的 Fetch Headers 错误
 
 ### 技术细节
 
-- 添加 `simpleEncrypt()` 和 `simpleDecrypt()` 函数
-- 修改 `saveSettings()` 自动加密 API Key
-- 修改 `loadSettings()` 自动解密 API Key
-- 无需额外依赖，不增加应用体积
+- 修改 `.input-wrap` CSS：`align-items:center`，`padding:9px 15px`
+- 修改 `appendBubble` 函数：移除 HTML 模板中的换行符
+- 添加 API Key ASCII 字符验证：`/^[\x00-\x7F]*$/`
+- 调整新建按钮 CSS：`margin-left:8px; margin-right:auto`
 
 ---
 
