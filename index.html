@@ -132,10 +132,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 
 /* message-row: ~1 char height (≈1em) vertical spacing */
-.message-row{padding:7px 26px;display:flex;gap:12px;max-width:860px;margin:0 auto;width:100%;animation:fadeUp .18s ease}
+.message-row{padding:7px 64px 7px 26px;display:flex;gap:12px;max-width:860px;margin:0 auto;width:100%;animation:fadeUp .18s ease;align-items:flex-start;margin-bottom:12px}
+.message-row.user-row{flex-direction:row-reverse;padding-right:26px;padding-left:calc(26px + 29px + 12px)}
+.message-row.user-row .bubble{display:flex;flex-direction:column;align-items:flex-end}
+.message-row.user-row .bubble-name{text-align:right}
+.message-row.user-row .bubble-content.user-msg{max-width:480px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 
-.avatar{width:29px;height:29px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:1px}
+.avatar{width:29px;height:29px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:-12px}
 .avatar.user{background:var(--bg4);color:var(--text2);border:1px solid var(--border2)}
 .avatar.assistant{background:linear-gradient(135deg,rgba(91,141,238,.13),rgba(78,203,140,.1));color:var(--accent);border:1px solid rgba(91,141,238,.22)}
 .bubble{flex:1;min-width:0}
@@ -144,6 +148,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .bubble-name.ai-name{color:var(--accent)}
 .bubble-content{font-size:14px;line-height:1.7;color:var(--text)}
 .bubble-content.user-msg{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 14px;white-space:pre-line;word-break:break-word}
+.bubble-content.ai-msg{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:9px 14px;word-break:break-word}
 
 /* Markdown */
 .bubble-content h1,.bubble-content h2,.bubble-content h3{color:var(--text);font-weight:600;margin:12px 0 5px;border-bottom:1px solid var(--border);padding-bottom:4px}
@@ -1165,11 +1170,11 @@ function g(id){ return document.getElementById(id); }
 function appendBubble(role, text, empty=false) {
   const isUser = role==='user';
   const row = document.createElement('div');
-  row.className = 'message-row';
+  row.className = 'message-row' + (isUser ? ' user-row' : '');
   row.innerHTML = `<div class="avatar ${role}">${isUser?'U':'AI'}</div>
     <div class="bubble">
       <div class="bubble-name ${isUser?'user-name':'ai-name'}">${isUser?'你':'DeepSeek'}</div>
-      <div class="bubble-content ${isUser?'user-msg':''}">${empty?'<span class="typing-cursor"></span>':(isUser?escapeHtml(text):renderMd(text))}</div>
+      <div class="bubble-content ${isUser?'user-msg':'ai-msg'}">${empty?'<span class="typing-cursor"></span>':(isUser?escapeHtml(text):renderMd(text))}</div>
     </div>`;
   g('messages').appendChild(row);
   scrollToBottom();
