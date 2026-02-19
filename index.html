@@ -290,10 +290,7 @@ kbd{background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-
             </div>
             <div class="field">
               <label class="field-label" for="api-key">API Key</label>
-              <input class="input mono-input" id="api-key" type="password" value="" placeholder="输入你的 API Key" oninput="saveSettings()" aria-label="API 密钥">
-              <div class="field-hint success">
-                🔒 API Key 已加密存储
-              </div>
+              <input class="input mono-input" id="api-key" type="text" value="" placeholder="输入你的 API Key" oninput="handleApiKeyInput()" aria-label="API 密钥">
             </div>
             <div class="field">
               <label class="field-label" for="model-name">模型名称</label>
@@ -633,9 +630,61 @@ async function setData(key, value) {
   }
 }
 
+// ══ API KEY MASKING ══
+let fullApiKey = ''; // 存储完整的 API Key
+let isTypingApiKey = false; // 标记是否正在输入
+
+function maskApiKey() {
+  const input = g('api-key');
+  if (!input) return;
+
+  const value = input.value;
+
+  // 如果是遮罩格式（包含星号），不处理
+  if (value.includes('*')) return;
+
+  // 如果有完整值，保存并遮罩
+  if (value && value.length > 12) {
+    fullApiKey = value;
+    const first8 = value.substring(0, 8);
+    const last4 = value.substring(value.length - 4);
+    input.value = `${first8}${'*'.repeat(value.length - 12)}${last4}`;
+  } else if (value) {
+    fullApiKey = value;
+  }
+}
+
+function handleApiKeyInput(event) {
+  const input = g('api-key');
+  if (!input) return;
+
+  const value = input.value;
+
+  // 如果用户在遮罩状态下输入，清空并允许重新输入
+  if (!isTypingApiKey && value.includes('*')) {
+    input.value = '';
+    fullApiKey = '';
+    isTypingApiKey = true;
+    return;
+  }
+
+  // 正在输入新的 API Key
+  isTypingApiKey = true;
+  fullApiKey = value;
+
+  // 延迟保存和遮罩
+  clearTimeout(input.saveTimer);
+  input.saveTimer = setTimeout(() => {
+    maskApiKey();
+    saveSettings();
+    isTypingApiKey = false;
+  }, 1000);
+}
+
 async function saveSettings() {
-  const apiKey = g('api-key').value;
+  const apiKey = fullApiKey || g('api-key').value;
   const encryptedKey = await encryptText(apiKey);
+
   await setData('S', {
     apiProvider: g('api-provider').value,
     apiUrl: g('api-url').value, apiKey: encryptedKey, modelName: g('model-name').value,
@@ -659,7 +708,17 @@ async function loadSettings() {
 
   setv('api-provider',  s.apiProvider ?? 'openrouter');
   setv('api-url',       s.apiUrl      ?? 'https://openrouter.ai/api/v1/chat/completions');
-  setv('api-key',       decryptedKey);
+
+  // 设置 API Key 并存储完整值，然后立即遮罩
+  fullApiKey = decryptedKey;
+  if (decryptedKey && decryptedKey.length > 12) {
+    const first8 = decryptedKey.substring(0, 8);
+    const last4 = decryptedKey.substring(decryptedKey.length - 4);
+    setv('api-key', `${first8}${'*'.repeat(decryptedKey.length - 12)}${last4}`);
+  } else {
+    setv('api-key', decryptedKey);
+  }
+
   setv('model-name',    s.modelName   ?? 'deepseek/deepseek-chat-v3.1');
   setv('s-max-tokens',  s.maxTokens   ?? 0);
   setv('s-temp',        s.temp        ?? 1);
@@ -804,7 +863,7 @@ async function sendMessage() {
   if (!text) return;
 
   // 验证 API Key 格式
-  const apiKeyCheck = g('api-key').value;
+  const apiKeyCheck = fullApiKey || g('api-key').value;
   if (apiKeyCheck && !/^[\x00-\x7F]*$/.test(apiKeyCheck)) {
     alert('⚠ API Key 包含非法字符，请检查是否包含中文或特殊符号');
     return;
@@ -826,7 +885,7 @@ async function sendMessage() {
   // Read params
   const provider = g('api-provider').value;
   const apiUrl  = g('api-url').value.trim();
-  const apiKey  = g('api-key').value.trim();
+  const apiKey  = (fullApiKey || g('api-key').value).trim();
   const model   = g('model-name').value.trim();
   const sysP    = g('system-prompt').value.trim();
   const mt      = parseInt(g('s-max-tokens').value);
