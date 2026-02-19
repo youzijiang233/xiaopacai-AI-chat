@@ -221,6 +221,29 @@ kbd{background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-
 
 /* Utility Classes */
 .hidden{display:none !important}
+
+/* PRESET DROPDOWN */
+.preset-selector{position:relative}
+.preset-btn{display:flex;align-items:center;justify-content:space-between;width:100%;padding:7px 10px;height:33px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:border-color .15s;text-align:left}
+.preset-btn:hover,.preset-btn.open{border-color:var(--accent)}
+.preset-btn svg{width:12px;height:12px;color:var(--text3);transition:transform .15s;flex-shrink:0}
+.preset-btn.open svg{transform:rotate(180deg)}
+.preset-dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;z-index:100;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.4)}
+.preset-item{display:flex;align-items:center;padding:7px 10px;cursor:pointer;gap:6px;transition:background .12s}
+.preset-item:hover{background:var(--bg4)}
+.preset-item.active{background:var(--accent-glow)}
+.preset-item-name{flex:1;font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.preset-item-name-input{flex:1;background:var(--bg4);border:1px solid var(--accent);border-radius:4px;color:var(--text);font-size:12px;padding:1px 5px;outline:none;font-family:'DM Sans',sans-serif;min-width:0}
+.preset-item-actions{display:none;gap:3px;flex-shrink:0}
+.preset-item:hover .preset-item-actions{display:flex}
+.preset-action-btn{width:20px;height:20px;border-radius:4px;border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.preset-action-btn:hover{background:var(--bg3);color:var(--text)}
+.preset-action-btn.del:hover{background:rgba(224,92,108,.15);color:var(--red)}
+.preset-action-btn svg{width:11px;height:11px}
+.preset-divider{height:1px;background:var(--border);margin:3px 0}
+.preset-new-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;cursor:pointer;color:var(--accent);font-size:12px;transition:background .12s}
+.preset-new-btn:hover{background:var(--bg4)}
+.preset-new-btn svg{width:13px;height:13px}
 </style>
 </head>
 <body>
@@ -278,23 +301,33 @@ kbd{background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-
           </div>
           <div class="collapse-body" id="body-api">
             <div class="field">
-              <label class="field-label" for="api-provider">API 提供商</label>
-              <select class="input" id="api-provider" onchange="onProviderChange()">
-                <option value="openrouter">OpenRouter</option>
-                <option value="custom">自定义</option>
-              </select>
+              <label class="field-label">API 预设</label>
+              <div class="preset-selector" id="preset-selector">
+                <button class="preset-btn" id="preset-btn" onclick="togglePresetDropdown()" type="button">
+                  <span id="preset-btn-name">openrouter</span>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="preset-dropdown hidden" id="preset-dropdown"></div>
+              </div>
             </div>
             <div class="field">
               <label class="field-label" for="api-url">API 端点</label>
-              <input class="input mono-input" id="api-url" type="text" value="https://openrouter.ai/api/v1/chat/completions" oninput="saveSettings()" aria-label="API 端点地址">
+              <input class="input mono-input" id="api-url" type="text" oninput="onPresetFieldChange()" aria-label="API 端点地址">
             </div>
             <div class="field">
               <label class="field-label" for="api-key">API Key</label>
-              <input class="input mono-input" id="api-key" type="text" value="" placeholder="输入你的 API Key" oninput="handleApiKeyInput()" aria-label="API 密钥">
+              <input class="input mono-input" id="api-key" type="text" placeholder="输入你的 API Key" oninput="handleApiKeyInput()" aria-label="API 密钥">
             </div>
             <div class="field">
               <label class="field-label" for="model-name">模型名称</label>
-              <input class="input mono-input" id="model-name" type="text" value="deepseek/deepseek-chat-v3.1" oninput="document.getElementById('model-badge').textContent=this.value;saveSettings()" aria-label="AI 模型名称">
+              <input class="input mono-input" id="model-name" type="text" oninput="document.getElementById('model-badge').textContent=this.value;onPresetFieldChange()" aria-label="AI 模型名称">
+            </div>
+            <div class="field">
+              <label class="field-label" for="api-format">API 格式</label>
+              <select class="input" id="api-format" onchange="onPresetFieldChange()" aria-label="API 格式">
+                <option value="openai">OpenAI 兼容（默认）</option>
+                <option value="claude">Anthropic Claude</option>
+              </select>
             </div>
           </div>
 
@@ -488,31 +521,106 @@ let mdEnabled = true;
 let hlEnabled = true;
 let activePanel = 'settings';
 
-// ══ API PROVIDERS ══
-const API_PROVIDERS = {
-  openrouter: {
-    name: 'OpenRouter',
-    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
-    defaultModel: 'deepseek/deepseek-chat-v3.1',
-    format: 'openai'
-  },
-  custom: {
-    name: '自定义',
-    endpoint: '',
-    defaultModel: '',
-    format: 'openai'
-  }
-};
+// ══ API PRESETS ══
+let apiPresets = [];
+let activePresetId = null;
+let fullApiKeys = {}; // { presetId: plaintext key }
 
-function onProviderChange() {
-  const provider = g('api-provider').value;
-  const config = API_PROVIDERS[provider];
-  if (provider !== 'custom') {
-    g('api-url').value = config.endpoint;
-    g('model-name').value = config.defaultModel;
-    g('model-badge').textContent = config.defaultModel;
-  }
+function getDefaultPresets() {
+  return [{ id: 'preset_default', name: 'openrouter', url: 'https://openrouter.ai/api/v1/chat/completions', model: 'deepseek/deepseek-chat-v3.1', format: 'openai' }];
+}
+
+function getActivePreset() {
+  return apiPresets.find(p => p.id === activePresetId) || apiPresets[0];
+}
+
+function renderPresetDropdown() {
+  const dd = g('preset-dropdown');
+  dd.innerHTML = apiPresets.map(p => `<div class="preset-item${p.id===activePresetId?' active':''}" onclick="selectPreset('${p.id}')">
+      <span class="preset-item-name" id="pname-${p.id}">${escapeHtml(p.name)}</span>
+      <div class="preset-item-actions">
+        <button class="preset-action-btn" onclick="startRenamePreset(event,'${p.id}')" title="重命名" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="preset-action-btn del" onclick="deletePreset(event,'${p.id}')" title="删除" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+    </div>`).join('') +
+    `<div class="preset-divider"></div><div class="preset-new-btn" onclick="addNewPreset()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>新建预设</div>`;
+}
+
+function togglePresetDropdown() {
+  const dd = g('preset-dropdown'), btn = g('preset-btn');
+  const isOpen = !dd.classList.contains('hidden');
+  if (isOpen) { dd.classList.add('hidden'); btn.classList.remove('open'); }
+  else { renderPresetDropdown(); dd.classList.remove('hidden'); btn.classList.add('open'); }
+}
+
+function selectPreset(id) {
+  activePresetId = id;
+  const p = getActivePreset();
+  g('preset-btn-name').textContent = p.name;
+  g('preset-dropdown').classList.add('hidden');
+  g('preset-btn').classList.remove('open');
+  g('api-url').value = p.url;
+  g('model-name').value = p.model;
+  g('model-badge').textContent = p.model;
+  g('api-format').value = p.format;
+  const plainKey = fullApiKeys[id] || '';
+  fullApiKey = plainKey;
+  isTypingApiKey = false;
+  if (plainKey && plainKey.length > 12) {
+    g('api-key').value = plainKey.substring(0,8) + '*'.repeat(plainKey.length-12) + plainKey.substring(plainKey.length-4);
+  } else { g('api-key').value = plainKey; }
   saveSettings();
+}
+
+function onPresetFieldChange() {
+  const p = getActivePreset();
+  if (!p) return;
+  p.url = g('api-url').value;
+  p.model = g('model-name').value;
+  p.format = g('api-format').value;
+  saveSettings();
+}
+
+async function addNewPreset() {
+  const id = 'preset_' + Date.now();
+  apiPresets.push({ id, name: '新预设', url: '', model: '', format: 'openai' });
+  fullApiKeys[id] = '';
+  selectPreset(id);
+  renderPresetDropdown();
+  setTimeout(() => startRenamePreset(null, id), 50);
+}
+
+function startRenamePreset(e, id) {
+  e && e.stopPropagation();
+  const nameEl = g('pname-' + id);
+  if (!nameEl) return;
+  const oldName = apiPresets.find(p => p.id === id)?.name || '';
+  const input = document.createElement('input');
+  input.className = 'preset-item-name-input';
+  input.value = oldName;
+  nameEl.replaceWith(input);
+  input.focus(); input.select();
+  let saved = false;
+  const finish = () => {
+    if (saved) return; saved = true;
+    const newName = input.value.trim() || oldName;
+    const p = apiPresets.find(p => p.id === id);
+    if (p) p.name = newName;
+    if (id === activePresetId) g('preset-btn-name').textContent = newName;
+    renderPresetDropdown();
+    saveSettings();
+  };
+  input.addEventListener('keydown', ev => { if(ev.key==='Enter'){ev.preventDefault();finish();} if(ev.key==='Escape'){saved=true;renderPresetDropdown();} });
+  input.addEventListener('blur', finish);
+}
+
+async function deletePreset(e, id) {
+  e && e.stopPropagation();
+  if (apiPresets.length <= 1) { showToast('至少保留一个预设'); return; }
+  apiPresets = apiPresets.filter(p => p.id !== id);
+  delete fullApiKeys[id];
+  if (activePresetId === id) selectPreset(apiPresets[0].id);
+  else { renderPresetDropdown(); saveSettings(); }
 }
 
 // ══ MARKED ══
@@ -657,69 +765,80 @@ function maskApiKey() {
 function handleApiKeyInput(event) {
   const input = g('api-key');
   if (!input) return;
-
   const value = input.value;
-
-  // 如果用户在遮罩状态下输入，清空并允许重新输入
   if (!isTypingApiKey && value.includes('*')) {
     input.value = '';
     fullApiKey = '';
+    fullApiKeys[activePresetId] = '';
     isTypingApiKey = true;
     return;
   }
-
-  // 正在输入新的 API Key
   isTypingApiKey = true;
   fullApiKey = value;
-
-  // 延迟保存和遮罩
   clearTimeout(input.saveTimer);
   input.saveTimer = setTimeout(() => {
     maskApiKey();
+    fullApiKeys[activePresetId] = fullApiKey;
     saveSettings();
     isTypingApiKey = false;
   }, 1000);
 }
 
 async function saveSettings() {
-  const apiKey = fullApiKey || g('api-key').value;
-  const encryptedKey = await encryptText(apiKey);
-
+  const encryptedPresets = await Promise.all(apiPresets.map(async p => ({
+    ...p,
+    key: await encryptText(fullApiKeys[p.id] || '')
+  })));
   await setData('S', {
-    apiProvider: g('api-provider').value,
-    apiUrl: g('api-url').value, apiKey: encryptedKey, modelName: g('model-name').value,
+    presets: encryptedPresets,
+    activePresetId,
     maxTokens: g('s-max-tokens').value, temp: g('s-temp').value,
     topP: g('s-top-p').value, topK: g('s-top-k').value,
     freqPen: g('s-freq-pen').value, presPen: g('s-pres-pen').value,
     repPen: g('s-rep-pen').value, minP: g('s-min-p').value, topA: g('s-top-a').value,
     sysPrompt: g('system-prompt').value,
     stream: streamEnabled, md: mdEnabled, hl: hlEnabled,
-    activePanel: activePanel,
+    activePanel,
   });
 }
 
 async function loadSettings() {
   const s = await getData('S');
-  if (!s) return;
   const setv = (id, val) => { if(g(id)) g(id).value = val; };
 
-  // 解密 API Key
-  const decryptedKey = s.apiKey ? await decryptText(s.apiKey) : '';
-
-  setv('api-provider',  s.apiProvider ?? 'openrouter');
-  setv('api-url',       s.apiUrl      ?? 'https://openrouter.ai/api/v1/chat/completions');
-
-  // 设置 API Key 并存储完整值，然后立即遮罩
-  fullApiKey = decryptedKey;
-  if (decryptedKey && decryptedKey.length > 12) {
-    const first8 = decryptedKey.substring(0, 8);
-    const last4 = decryptedKey.substring(decryptedKey.length - 4);
-    setv('api-key', `${first8}${'*'.repeat(decryptedKey.length - 12)}${last4}`);
+  // 加载预设
+  if (s?.presets?.length) {
+    for (const p of s.presets) {
+      fullApiKeys[p.id] = p.key ? await decryptText(p.key) : '';
+    }
+    apiPresets = s.presets.map(p => { const {key, ...rest} = p; return rest; });
+    activePresetId = s.activePresetId || apiPresets[0].id;
+  } else if (s?.apiUrl) {
+    // 迁移旧数据格式
+    const id = 'preset_migrated';
+    apiPresets = [{ id, name: s.apiProvider || 'openrouter', url: s.apiUrl, model: s.modelName || 'deepseek/deepseek-chat-v3.1', format: 'openai' }];
+    fullApiKeys[id] = s.apiKey ? await decryptText(s.apiKey) : '';
+    activePresetId = id;
   } else {
-    setv('api-key', decryptedKey);
+    apiPresets = getDefaultPresets();
+    activePresetId = apiPresets[0].id;
+    fullApiKeys[activePresetId] = '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';
   }
 
-  setv('model-name',    s.modelName   ?? 'deepseek/deepseek-chat-v3.1');
+  // 填充当前预设字段
+  const p = getActivePreset();
+  g('preset-btn-name').textContent = p.name;
+  g('api-url').value = p.url;
+  g('model-name').value = p.model;
+  g('model-badge').textContent = p.model;
+  g('api-format').value = p.format || 'openai';
+  const plainKey = fullApiKeys[activePresetId] || '';
+  fullApiKey = plainKey;
+  if (plainKey && plainKey.length > 12) {
+    g('api-key').value = plainKey.substring(0,8) + '*'.repeat(plainKey.length-12) + plainKey.substring(plainKey.length-4);
+  } else { g('api-key').value = plainKey; }
+
+  if (!s) return;
   setv('s-max-tokens',  s.maxTokens   ?? 0);
   setv('s-temp',        s.temp        ?? 1);
   setv('s-top-p',       s.topP        ?? 1);
@@ -730,7 +849,6 @@ async function loadSettings() {
   setv('s-min-p',       s.minP        ?? 0);
   setv('s-top-a',       s.topA        ?? 0);
   setv('system-prompt', s.sysPrompt   ?? 'You are a helpful, accurate, and thoughtful AI assistant.');
-  g('model-badge').textContent = s.modelName ?? 'deepseek/deepseek-chat-v3.1';
   streamEnabled = s.stream !== false;
   mdEnabled     = s.md     !== false;
   hlEnabled     = s.hl     !== false;
@@ -738,10 +856,7 @@ async function loadSettings() {
   g('md-toggle').classList.toggle('on', mdEnabled);
   g('hl-toggle').classList.toggle('on', hlEnabled);
   refreshDisplays();
-  // 恢复侧边栏状态
-  if (s.activePanel) {
-    switchPanel(s.activePanel);
-  }
+  if (s.activePanel) switchPanel(s.activePanel);
 }
 
 function refreshDisplays() {
@@ -883,10 +998,11 @@ async function sendMessage() {
   setGenerating(true);
 
   // Read params
-  const provider = g('api-provider').value;
-  const apiUrl  = g('api-url').value.trim();
-  const apiKey  = (fullApiKey || g('api-key').value).trim();
-  const model   = g('model-name').value.trim();
+  const preset = getActivePreset();
+  const apiUrl  = preset.url.trim();
+  const apiKey  = (fullApiKey || '').trim();
+  const model   = preset.model.trim();
+  const format  = preset.format || 'openai';
   const sysP    = g('system-prompt').value.trim();
   const mt      = parseInt(g('s-max-tokens').value);
   const temp    = parseFloat(g('s-temp').value);
@@ -904,11 +1020,10 @@ async function sendMessage() {
   try {
     setStatus('yellow','生成中…');
 
-    // Prepare request based on API provider
+    // Prepare request based on API format
     let headers, body;
-    const providerConfig = API_PROVIDERS[provider];
 
-    if (providerConfig.format === 'claude') {
+    if (format === 'claude') {
       // Claude API format
       headers = {
         'Content-Type': 'application/json',
@@ -955,8 +1070,7 @@ async function sendMessage() {
       const dec = new TextDecoder();
       let buf = '';
 
-      if (providerConfig.format === 'claude') {
-        // Claude streaming format
+      if (format === 'claude') {
         while(true) {
           const {done, value} = await reader.read();
           if(done) break;
@@ -1001,7 +1115,7 @@ async function sendMessage() {
       contentEl.innerHTML = renderMd(fullText);
     } else {
       const data = await res.json();
-      if (providerConfig.format === 'claude') {
+      if (format === 'claude') {
         fullText = data.content[0].text;
       } else {
         fullText = data.choices[0].message.content;
@@ -1136,6 +1250,13 @@ function toggleOpt(key) {
   } else { await newChat(false); }
   renderMessages(); renderConvList(); updateStats(); scrollToBottom();
   g('sidebar-panel').classList.remove('hidden');
+  document.addEventListener('click', e => {
+    const sel = g('preset-selector');
+    if (sel && !sel.contains(e.target)) {
+      g('preset-dropdown').classList.add('hidden');
+      g('preset-btn').classList.remove('open');
+    }
+  });
 })();
 </script>
 </body>
