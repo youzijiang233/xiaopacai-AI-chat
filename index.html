@@ -343,63 +343,70 @@ kbd{background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-
           </div>
           <div class="collapse-body" id="body-gen">
             <div class="field">
-              <label class="field-label" for="s-max-tokens">Max Tokens <span class="field-hint">0 = 不限</span></label>
+              <label class="field-label" for="s-max-tokens">Max Tokens <span class="field-hint">（最大输出长度，0 = 不限）</span></label>
               <div class="slider-row">
                 <input class="slider" id="s-max-tokens" type="range" min="0" max="8192" step="128" value="0" oninput="syncParam(this,'max-tokens-val',v=>v==0?'∞':v)" aria-label="最大令牌数">
                 <span class="slider-val" id="max-tokens-val">∞</span>
               </div>
             </div>
             <div class="field">
-              <label class="field-label" for="s-temp">Temperature</label>
+              <label class="field-label" for="s-chat-memory">Chat Memory <span class="field-hint">（上下文轮数，0 = 不限）</span></label>
+              <div class="slider-row">
+                <input class="slider" id="s-chat-memory" type="range" min="0" max="50" step="1" value="10" oninput="syncParam(this,'chat-memory-val',v=>v==0?'∞':v)" aria-label="上下文轮数">
+                <span class="slider-val" id="chat-memory-val">10</span>
+              </div>
+            </div>
+            <div class="field">
+              <label class="field-label" for="s-temp">Temperature <span class="field-hint">（随机性，越高越发散）</span></label>
               <div class="slider-row">
                 <input class="slider" id="s-temp" type="range" min="0" max="2" step="0.001" value="1" oninput="syncParam(this,'temp-val',v=>parseFloat(v).toFixed(3))" aria-label="温度参数">
                 <span class="slider-val" id="temp-val">1.000</span>
               </div>
             </div>
             <div class="field">
-              <label class="field-label" for="s-top-p">Top P</label>
+              <label class="field-label" for="s-top-p">Top P <span class="field-hint">（核采样，过滤低概率词）</span></label>
               <div class="slider-row">
                 <input class="slider" id="s-top-p" type="range" min="0" max="1" step="0.001" value="1" oninput="syncParam(this,'top-p-val',v=>parseFloat(v).toFixed(3))" aria-label="Top P 参数">
                 <span class="slider-val" id="top-p-val">1.000</span>
               </div>
             </div>
             <div class="field">
-              <label class="field-label" for="s-top-k">Top K</label>
+              <label class="field-label" for="s-top-k">Top K <span class="field-hint">（候选词数量，0 = 不限）</span></label>
               <div class="slider-row">
                 <input class="slider" id="s-top-k" type="range" min="0" max="200" step="1" value="0" oninput="syncParam(this,'top-k-val',v=>parseInt(v))" aria-label="Top K 参数">
                 <span class="slider-val" id="top-k-val">0</span>
               </div>
             </div>
             <div class="field">
-              <label class="field-label" for="s-freq-pen">Frequency Penalty</label>
+              <label class="field-label" for="s-freq-pen">Frequency Penalty <span class="field-hint">（降低重复词频率）</span></label>
               <div class="slider-row">
                 <input class="slider" id="s-freq-pen" type="range" min="-2" max="2" step="0.001" value="0" oninput="syncParam(this,'freq-pen-val',v=>parseFloat(v).toFixed(3))" aria-label="频率惩罚">
                 <span class="slider-val" id="freq-pen-val">0.000</span>
               </div>
             </div>
             <div class="field">
-              <label class="field-label" for="s-pres-pen">Presence Penalty</label>
+              <label class="field-label" for="s-pres-pen">Presence Penalty <span class="field-hint">（鼓励引入新话题）</span></label>
               <div class="slider-row">
                 <input class="slider" id="s-pres-pen" type="range" min="-2" max="2" step="0.001" value="0" oninput="syncParam(this,'pres-pen-val',v=>parseFloat(v).toFixed(3))" aria-label="存在惩罚">
                 <span class="slider-val" id="pres-pen-val">0.000</span>
               </div>
             </div>
             <div class="field">
-              <label class="field-label" for="s-rep-pen">Repetition Penalty</label>
+              <label class="field-label" for="s-rep-pen">Repetition Penalty <span class="field-hint">（惩罚重复内容，&gt;1 更严）</span></label>
               <div class="slider-row">
                 <input class="slider" id="s-rep-pen" type="range" min="0.5" max="2" step="0.001" value="1" oninput="syncParam(this,'rep-pen-val',v=>parseFloat(v).toFixed(3))" aria-label="重复惩罚">
                 <span class="slider-val" id="rep-pen-val">1.000</span>
               </div>
             </div>
             <div class="field">
-              <label class="field-label" for="s-min-p">Min P</label>
+              <label class="field-label" for="s-min-p">Min P <span class="field-hint">（最低概率阈值过滤）</span></label>
               <div class="slider-row">
                 <input class="slider" id="s-min-p" type="range" min="0" max="1" step="0.001" value="0" oninput="syncParam(this,'min-p-val',v=>parseFloat(v).toFixed(3))" aria-label="Min P 参数">
                 <span class="slider-val" id="min-p-val">0.000</span>
               </div>
             </div>
             <div class="field">
-              <label class="field-label" for="s-top-a">Top A</label>
+              <label class="field-label" for="s-top-a">Top A <span class="field-hint">（自适应采样阈值）</span></label>
               <div class="slider-row">
                 <input class="slider" id="s-top-a" type="range" min="0" max="1" step="0.001" value="0" oninput="syncParam(this,'top-a-val',v=>parseFloat(v).toFixed(3))" aria-label="Top A 参数">
                 <span class="slider-val" id="top-a-val">0.000</span>
@@ -792,13 +799,15 @@ async function saveSettings() {
   await setData('S', {
     presets: encryptedPresets,
     activePresetId,
-    maxTokens: g('s-max-tokens').value, temp: g('s-temp').value,
+    maxTokens: g('s-max-tokens').value, chatMemory: g('s-chat-memory').value,
+    temp: g('s-temp').value,
     topP: g('s-top-p').value, topK: g('s-top-k').value,
     freqPen: g('s-freq-pen').value, presPen: g('s-pres-pen').value,
     repPen: g('s-rep-pen').value, minP: g('s-min-p').value, topA: g('s-top-a').value,
     sysPrompt: g('system-prompt').value,
     stream: streamEnabled, md: mdEnabled, hl: hlEnabled,
     activePanel,
+    collapseStates: getCollapseStates(),
   });
 }
 
@@ -814,7 +823,6 @@ async function loadSettings() {
     apiPresets = s.presets.map(p => { const {key, ...rest} = p; return rest; });
     activePresetId = s.activePresetId || apiPresets[0].id;
   } else if (s?.apiUrl) {
-    // 迁移旧数据格式
     const id = 'preset_migrated';
     apiPresets = [{ id, name: s.apiProvider || 'openrouter', url: s.apiUrl, model: s.modelName || 'deepseek/deepseek-chat-v3.1', format: 'openai' }];
     fullApiKeys[id] = s.apiKey ? await decryptText(s.apiKey) : '';
@@ -840,6 +848,7 @@ async function loadSettings() {
 
   if (!s) return;
   setv('s-max-tokens',  s.maxTokens   ?? 0);
+  setv('s-chat-memory', s.chatMemory  ?? 10);
   setv('s-temp',        s.temp        ?? 1);
   setv('s-top-p',       s.topP        ?? 1);
   setv('s-top-k',       s.topK        ?? 0);
@@ -856,20 +865,23 @@ async function loadSettings() {
   g('md-toggle').classList.toggle('on', mdEnabled);
   g('hl-toggle').classList.toggle('on', hlEnabled);
   refreshDisplays();
-  if (s.activePanel) switchPanel(s.activePanel);
+  if (s.collapseStates) applyCollapseStates(s.collapseStates);
+  if ('activePanel' in s) restorePanel(s.activePanel);
 }
 
 function refreshDisplays() {
   const mt = parseInt(g('s-max-tokens').value);
-  g('max-tokens-val').textContent = mt === 0 ? '∞' : mt;
-  g('temp-val').textContent       = parseFloat(g('s-temp').value).toFixed(3);
-  g('top-p-val').textContent      = parseFloat(g('s-top-p').value).toFixed(3);
-  g('top-k-val').textContent      = parseInt(g('s-top-k').value);
-  g('freq-pen-val').textContent   = parseFloat(g('s-freq-pen').value).toFixed(3);
-  g('pres-pen-val').textContent   = parseFloat(g('s-pres-pen').value).toFixed(3);
-  g('rep-pen-val').textContent    = parseFloat(g('s-rep-pen').value).toFixed(3);
-  g('min-p-val').textContent      = parseFloat(g('s-min-p').value).toFixed(3);
-  g('top-a-val').textContent      = parseFloat(g('s-top-a').value).toFixed(3);
+  g('max-tokens-val').textContent  = mt === 0 ? '∞' : mt;
+  const cm = parseInt(g('s-chat-memory').value);
+  g('chat-memory-val').textContent = cm === 0 ? '∞' : cm;
+  g('temp-val').textContent        = parseFloat(g('s-temp').value).toFixed(3);
+  g('top-p-val').textContent       = parseFloat(g('s-top-p').value).toFixed(3);
+  g('top-k-val').textContent       = parseInt(g('s-top-k').value);
+  g('freq-pen-val').textContent    = parseFloat(g('s-freq-pen').value).toFixed(3);
+  g('pres-pen-val').textContent    = parseFloat(g('s-pres-pen').value).toFixed(3);
+  g('rep-pen-val').textContent     = parseFloat(g('s-rep-pen').value).toFixed(3);
+  g('min-p-val').textContent       = parseFloat(g('s-min-p').value).toFixed(3);
+  g('top-a-val').textContent       = parseFloat(g('s-top-a').value).toFixed(3);
 }
 
 function syncParam(el, valId, fmt) {
@@ -1004,6 +1016,7 @@ async function sendMessage() {
   const model   = preset.model.trim();
   const format  = preset.format || 'openai';
   const sysP    = g('system-prompt').value.trim();
+  const chatMemory = parseInt(g('s-chat-memory').value) || 0;
   const mt      = parseInt(g('s-max-tokens').value);
   const temp    = parseFloat(g('s-temp').value);
   const topP    = parseFloat(g('s-top-p').value);
@@ -1023,6 +1036,10 @@ async function sendMessage() {
     // Prepare request based on API format
     let headers, body;
 
+    // Apply chat memory limit (slice to last N rounds = 2N messages)
+    const nonSysMsgs = currentMessages.filter(m => m.role !== 'system');
+    const sliced = chatMemory > 0 ? nonSysMsgs.slice(-(chatMemory * 2)) : nonSysMsgs;
+
     if (format === 'claude') {
       // Claude API format
       headers = {
@@ -1037,7 +1054,7 @@ async function sendMessage() {
         top_p: topP,
         top_k: topK > 0 ? topK : undefined,
         stream: streamEnabled,
-        messages: currentMessages.map(m => ({ role: m.role, content: m.content }))
+        messages: sliced.map(m => ({ role: m.role, content: m.content }))
       };
       if (sysP) body.system = sysP;
     } else {
@@ -1048,7 +1065,7 @@ async function sendMessage() {
       };
       const messages = [];
       if (sysP) messages.push({ role:'system', content:sysP });
-      messages.push(...currentMessages);
+      messages.push(...sliced);
 
       body = { model, messages, temperature: temp, top_p: topP, frequency_penalty: freqPen, presence_penalty: presPen, repetition_penalty: repPen, stream: streamEnabled };
       if (mt > 0)   body.max_tokens = mt;
@@ -1224,11 +1241,45 @@ function switchPanel(name) {
   saveSettings();
 }
 
+// 仅用于 loadSettings 恢复布局，不触发 saveSettings
+function restorePanel(name) {
+  const panel=g('sidebar-panel');
+  const sp=g('panel-settings'), hp=g('panel-history');
+  const rs=g('rail-settings'), rh=g('rail-history');
+  if (!name) {
+    activePanel=null; panel.classList.add('hidden');
+    rs.classList.remove('active'); rh.classList.remove('active');
+    return;
+  }
+  activePanel=name; panel.classList.remove('hidden');
+  sp.style.display = name==='settings'?'flex':'none';
+  hp.style.display  = name==='history' ?'flex':'none';
+  rs.classList.toggle('active',name==='settings');
+  rh.classList.toggle('active',name==='history');
+}
+
 function toggleCollapse(key) {
   const body=g('body-'+key), arrow=g('arrow-'+key);
   const closing=!body.classList.contains('closed');
   body.classList.toggle('closed',closing);
   arrow.classList.toggle('open',!closing);
+  saveSettings();
+}
+
+function getCollapseStates() {
+  const keys = ['api','gen','opts','sys'];
+  const states = {};
+  keys.forEach(k => { states[k] = !g('body-'+k).classList.contains('closed'); });
+  return states;
+}
+
+function applyCollapseStates(states) {
+  Object.entries(states).forEach(([k, open]) => {
+    const body = g('body-'+k), arrow = g('arrow-'+k);
+    if (!body) return;
+    body.classList.toggle('closed', !open);
+    arrow.classList.toggle('open', open);
+  });
 }
 
 function toggleOpt(key) {
@@ -1249,7 +1300,6 @@ function toggleOpt(key) {
     else await newChat(false);
   } else { await newChat(false); }
   renderMessages(); renderConvList(); updateStats(); scrollToBottom();
-  g('sidebar-panel').classList.remove('hidden');
   document.addEventListener('click', e => {
     const sel = g('preset-selector');
     if (sel && !sel.contains(e.target)) {
