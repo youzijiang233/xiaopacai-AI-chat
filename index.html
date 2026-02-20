@@ -301,10 +301,6 @@ kbd{background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-
       <span class="status-dot green" id="status-dot"></span>
       <span id="status-text">就绪</span>
     </div>
-    <button class="btn btn-danger" onclick="clearCurrentChat()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-      清空对话
-    </button>
   </div>
 </div>
 
@@ -619,27 +615,30 @@ function buildRenderPath(conv) {
   let currentId = conv.rootMessageId;
 
   while (currentId) {
+    // 检查当前ID是消息还是分支节点
     const message = conv.messages[currentId];
-    if (!message) break;
+    const branchNode = conv.branchNodes[currentId];
 
-    path.push(message);
+    if (message) {
+      // 是消息
+      path.push(message);
 
-    // 检查是否有分支节点
-    const branchNode = findBranchNodeByParent(conv, currentId);
-
-    if (branchNode) {
-      // 有分支节点，记录分支点位置（key为分支第一条消息ID）
+      if (message.children && message.children.length === 1) {
+        currentId = message.children[0];  // 可能是消息ID或分支节点ID
+      } else if (!message.children || message.children.length === 0) {
+        // 叶子节点，结束
+        break;
+      } else {
+        // 多个子节点（数据异常）
+        console.error('Multiple children in message:', currentId);
+        break;
+      }
+    } else if (branchNode) {
+      // 是分支节点
       branchPoints.set(branchNode.activeChildId, branchNode);
-      currentId = branchNode.activeChildId;
-    } else if (message.children && message.children.length === 1) {
-      // 只有一个子节点，直接跟随
-      currentId = message.children[0];
-    } else if (!message.children || message.children.length === 0) {
-      // 叶子节点，结束
-      break;
+      currentId = branchNode.activeChildId;  // 跳转到激活的分支
     } else {
-      // 多个子节点但没有分支节点（数据异常）
-      console.error('Multiple children without branch node:', currentId);
+      // 既不是消息也不是分支节点，结束
       break;
     }
   }
@@ -1155,9 +1154,38 @@ async function getConvs() {
 }
 
 // 保存单个对话到独立文件
-async function saveConv(conv) {
+async function saveConv(conv, updateTime = true) {
+  // 更新时间戳（可选）
+  if (updateTime) {
+    conv.updatedAt = Date.now();
+  }
+
+  // 自动生成标题（仅在第一次且标题为"新对话"时）
+  const oldTitle = conv.title;
+  if (!conv.autoTitleGenerated && conv.title === '新对话') {
+    if (conv.rootMessageId && conv.messages[conv.rootMessageId]) {
+      const { messages } = buildRenderPath(conv);
+      const firstUser = messages.find(m => m.role === 'user');
+      if (firstUser) {
+        conv.title = firstUser.content.slice(0, 28) + (firstUser.content.length > 28 ? '…' : '');
+        conv.autoTitleGenerated = true;
+      }
+    }
+  }
+
   if (isElectron) {
     await window.electronAPI.ensureFolder(CONVERSATIONS_FOLDER);
+
+    // 如果标题改变了，删除旧文件
+    if (oldTitle !== conv.title) {
+      const oldFilename = `${CONVERSATIONS_FOLDER}/${oldTitle.replace(/[<>:"/\\|?*]/g, '_').substring(0, 50)}_${conv.id}.json`;
+      try {
+        await window.electronAPI.deleteFile(oldFilename);
+      } catch (e) {
+        // 旧文件可能不存在，忽略错误
+      }
+    }
+
     const filename = getConvFileName(conv);
     const data = JSON.stringify(conv, null, 2);
     await window.electronAPI.writeData(filename, data);
@@ -1171,6 +1199,11 @@ async function saveConv(conv) {
       convs.unshift(conv);
     }
     await setData('C', convs);
+  }
+
+  // 如果更新了时间戳，重新渲染对话列表以更新顺序
+  if (updateTime) {
+    renderConvList();
   }
 }
 
@@ -1211,19 +1244,9 @@ async function saveCurrentConv() {
   // 深拷贝整个对话对象
   conv.messages = JSON.parse(JSON.stringify(conv.messages || {}));
   conv.branchNodes = JSON.parse(JSON.stringify(conv.branchNodes || {}));
-  conv.updatedAt = Date.now();
 
-  // 更新标题（从第一条用户消息生成）
-  if (conv.rootMessageId && conv.messages[conv.rootMessageId]) {
-    const { messages } = buildRenderPath(conv);
-    const firstUser = messages.find(m => m.role === 'user');
-    if (firstUser) {
-      conv.title = firstUser.content.slice(0, 28) + (firstUser.content.length > 28 ? '…' : '');
-    }
-  }
-
-  // 保存单个对话文件
-  await saveConv(conv);
+  // 保存单个对话文件（不更新时间戳）
+  await saveConv(conv, false);
   renderConvList();
 }
 
@@ -1250,6 +1273,7 @@ async function newChat(saveCurrent = true) {
   const newConv = {
     id: id,
     title: '新对话',
+    autoTitleGenerated: false,
     rootMessageId: systemMsgId,
     messages: {
       [systemMsgId]: systemMessage
@@ -1274,7 +1298,11 @@ async function newChat(saveCurrent = true) {
  * 加载对话（树状结构）
  */
 async function loadConv(id) {
-  await saveCurrentConv();
+  // 只在切换到不同对话时才保存当前对话
+  if (currentConvId !== id) {
+    await saveCurrentConv();
+  }
+
   const convs = await getConvs();
   const conv = convs.find(c => c.id === id);
   if (!conv) return;
@@ -1654,20 +1682,27 @@ async function sendMessage(retryText = null, isRetry = false) {
     let currentId = conv.rootMessageId;
 
     while (currentId && currentId !== aiMessageId) {
+      // 检查是消息还是分支节点
       const msg = conv.messages[currentId];
-      if (!msg) break;
+      const branchNode = conv.branchNodes[currentId];
 
-      if (msg.role !== 'system') {
-        messageHistory.push({ role: msg.role, content: msg.content });
-      }
+      if (msg) {
+        // 是消息
+        if (msg.role !== 'system') {
+          messageHistory.push({ role: msg.role, content: msg.content });
+        }
 
-      // 查找下一个消息
-      const branchNode = findBranchNodeByParent(conv, currentId);
-      if (branchNode) {
+        // 移动到下一个节点（可能是消息或分支节点）
+        if (msg.children && msg.children.length > 0) {
+          currentId = msg.children[0];
+        } else {
+          break;
+        }
+      } else if (branchNode) {
+        // 是分支节点，跳转到激活的分支
         currentId = branchNode.activeChildId;
-      } else if (msg.children && msg.children.length > 0) {
-        currentId = msg.children[0];
       } else {
+        // 既不是消息也不是分支节点，结束
         break;
       }
     }
@@ -2158,60 +2193,100 @@ async function deleteMessage(btn) {
   const parentId = message.parentId;
   const children = message.children || [];
 
-  // 判断：如果有子消息，只清空内容；如果没有子消息，删除整个消息和分支
-  if (children.length > 0) {
-    // 情况1：有子消息，只清空内容为换行符
+  // 修改：检查parentId是消息还是分支节点
+  const parentMessage = conv.messages[parentId];
+  const parentBranchNode = conv.branchNodes[parentId];
+
+  // 判断删除策略
+  if (children.length > 0 && parentBranchNode) {
+    // 情况1：有子消息 + 父节点是分支节点 → 只清空内容为换行符（保留分支结构）
     message.content = "\n";
     await saveConv(conv);
     await renderMessages();
-  } else {
-    // 情况2：没有子消息，删除整个消息
+  } else if (children.length > 0 && parentMessage) {
+    // 情况2：有子消息 + 父节点是消息 → 删除该消息，将子节点接到父消息上
+    const childId = children[0]; // 只有一个子节点（单链或分支节点）
 
-    // 检查这个消息是否是某个分支的 firstMessageId
-    let branchNodeToUpdate = null;
-    let branchIndexToDelete = -1;
-
-    if (parentId) {
-      const branchNode = findBranchNodeByParent(conv, parentId);
-      if (branchNode) {
-        // 找到该消息在分支节点中的位置
-        branchIndexToDelete = branchNode.branches.findIndex(b => b.firstMessageId === messageId);
-        if (branchIndexToDelete !== -1) {
-          branchNodeToUpdate = branchNode;
-        }
-      }
+    // 将子节点的parentId改为父消息ID
+    const childMessage = conv.messages[childId];
+    const childBranchNode = conv.branchNodes[childId];
+    if (childMessage) {
+      childMessage.parentId = parentId;
+    } else if (childBranchNode) {
+      childBranchNode.parentMessageId = parentId;
     }
 
-    // 从父消息的children中移除
-    if (parentId && conv.messages[parentId]) {
-      const parent = conv.messages[parentId];
-      parent.children = parent.children.filter(id => id !== messageId);
+    // 将父消息的children中的当前消息ID替换为子节点ID
+    const msgIndex = parentMessage.children.indexOf(messageId);
+    if (msgIndex !== -1) {
+      parentMessage.children[msgIndex] = childId;
     }
 
-    // 删除消息对象
+    // 删除当前消息
     delete conv.messages[messageId];
 
-    // 如果是分支的一部分，从分支节点中删除该分支
-    if (branchNodeToUpdate && branchIndexToDelete !== -1) {
-      branchNodeToUpdate.branches.splice(branchIndexToDelete, 1);
+    await saveConv(conv);
+    await renderMessages();
+  } else {
+    // 情况3：没有子消息 → 完全删除
 
-      // 如果当前激活的分支被删除，切换到其他分支
-      if (branchNodeToUpdate.activeChildId === messageId) {
-        if (branchNodeToUpdate.branches.length > 0) {
-          // 切换到前一个分支，如果是第一个则切换到下一个
-          const newIndex = branchIndexToDelete > 0 ? branchIndexToDelete - 1 : 0;
-          branchNodeToUpdate.activeChildId = branchNodeToUpdate.branches[newIndex].firstMessageId;
-        } else {
+    if (parentMessage) {
+      // 父节点是消息，直接从children中移除
+      const childIndex = parentMessage.children.indexOf(messageId);
+      if (childIndex !== -1) {
+        parentMessage.children.splice(childIndex, 1);
+      }
+    } else if (parentBranchNode) {
+      // 父节点是分支节点
+      const branchIndex = parentBranchNode.branches.findIndex(
+        b => b.firstMessageId === messageId
+      );
+
+      if (branchIndex !== -1) {
+        // 删除该分支
+        parentBranchNode.branches.splice(branchIndex, 1);
+
+        // 如果只剩一个分支，删除分支节点，恢复直接连接
+        if (parentBranchNode.branches.length === 1) {
+          const lastBranch = parentBranchNode.branches[0];
+          const grandParent = conv.messages[parentBranchNode.parentMessageId];
+
+          if (grandParent) {
+            // 将祖父消息的children从分支节点ID改为消息ID
+            const nodeIndex = grandParent.children.indexOf(parentId);
+            if (nodeIndex !== -1) {
+              grandParent.children[nodeIndex] = lastBranch.firstMessageId;
+            }
+
+            // 更新子消息的parentId从分支节点ID改为祖父消息ID
+            const childMessage = conv.messages[lastBranch.firstMessageId];
+            if (childMessage) {
+              childMessage.parentId = parentBranchNode.parentMessageId;
+            }
+          }
+
+          // 删除分支节点
+          delete conv.branchNodes[parentId];
+        } else if (parentBranchNode.branches.length === 0) {
           // 没有分支了，删除分支节点
-          delete conv.branchNodes[branchNodeToUpdate.id];
+          const grandParent = conv.messages[parentBranchNode.parentMessageId];
+          if (grandParent) {
+            const nodeIndex = grandParent.children.indexOf(parentId);
+            if (nodeIndex !== -1) {
+              grandParent.children.splice(nodeIndex, 1);
+            }
+          }
+          delete conv.branchNodes[parentId];
+        } else if (parentBranchNode.activeChildId === messageId) {
+          // 切换到其他分支
+          const newIndex = Math.max(0, branchIndex - 1);
+          parentBranchNode.activeChildId = parentBranchNode.branches[newIndex].firstMessageId;
         }
       }
-
-      // 如果只剩1个分支，删除分支节点
-      if (branchNodeToUpdate.branches.length === 1) {
-        delete conv.branchNodes[branchNodeToUpdate.id];
-      }
     }
+
+    // 删除消息本身
+    delete conv.messages[messageId];
 
     await saveConv(conv);
     await renderMessages();
@@ -2237,27 +2312,50 @@ async function retryMessage(btn) {
   if (isUserMessage) {
     // 用户消息的重试：在该用户消息下创建分支节点，生成新的AI回复
     // 检查是否已存在分支节点
-    let branchNode = findBranchNodeByParent(conv, messageId);
+    let branchNode = null;
 
-    if (!branchNode) {
-      // 查找当前用户消息的第一个AI子消息（如果有）
-      const firstAIChild = message.children.length > 0 ? message.children[0] : null;
+    // 查找当前用户消息的第一个子节点（可能是AI消息ID或分支节点ID）
+    const firstChild = message.children.length > 0 ? message.children[0] : null;
 
-      // 创建新的分支节点
+    if (firstChild) {
+      if (conv.branchNodes[firstChild]) {
+        // 子节点已经是分支节点，直接使用
+        branchNode = conv.branchNodes[firstChild];
+      } else if (conv.messages[firstChild]) {
+        // 子节点是消息，需要创建分支节点
+        branchNode = {
+          id: generateId16(),
+          parentMessageId: messageId,
+          branches: [
+            {
+              id: generateId16(),
+              firstMessageId: firstChild,
+              createdAt: Date.now()
+            }
+          ],
+          activeChildId: firstChild
+        };
+        conv.branchNodes[branchNode.id] = branchNode;
+
+        // 修改：将用户消息的children改为只包含分支节点ID
+        message.children = [branchNode.id];
+
+        // 修改：更新原AI消息的parentId为分支节点ID
+        conv.messages[firstChild].parentId = branchNode.id;
+      }
+    } else {
+      // 没有子节点，创建空的分支节点
       branchNode = {
         id: generateId16(),
-        parentId: messageId,
-        branches: firstAIChild ? [
-          {
-            id: generateId16(),
-            firstMessageId: firstAIChild,
-            order: 0
-          }
-        ] : [],
-        activeChildId: firstAIChild
+        parentMessageId: messageId,
+        branches: [],
+        activeChildId: null
       };
       conv.branchNodes[branchNode.id] = branchNode;
+      message.children = [branchNode.id];
     }
+
+    if (!branchNode) return;
 
     // 创建新的AI消息（新分支）
     const newAIMessageId = generateId16();
@@ -2265,7 +2363,7 @@ async function retryMessage(btn) {
       id: newAIMessageId,
       role: 'assistant',
       content: '\n',  // 初始显示换行符
-      parentId: messageId,
+      parentId: branchNode.id,  // 修改：指向分支节点
       children: [],
       timestamp: Date.now()
     };
@@ -2276,16 +2374,11 @@ async function retryMessage(btn) {
     branchNode.branches.push({
       id: generateId16(),
       firstMessageId: newAIMessageId,
-      order: branchNode.branches.length
+      createdAt: Date.now()
     });
 
     // 更新activeChildId
     branchNode.activeChildId = newAIMessageId;
-
-    // 更新用户消息的children
-    if (!message.children.includes(newAIMessageId)) {
-      message.children.push(newAIMessageId);
-    }
 
     // 保存并重新渲染
     await saveConv(conv);
@@ -2295,18 +2388,33 @@ async function retryMessage(btn) {
     await sendMessageToTree(message.content, newAIMessageId);
 
   } else {
-    // AI消息的重试：在父消息下创建分支节点，生成新的AI回复
+    // AI消息的重试：在父节点下创建分支节点，生成新的AI回复
     const parentId = message.parentId;
 
-    if (!parentId || !conv.messages[parentId]) return;
-
+    // 检查父节点是消息还是分支节点
     const parentMessage = conv.messages[parentId];
+    const parentBranchNode = conv.branchNodes[parentId];
 
-    // 找到父消息对应的用户消息
-    let userMessage = parentMessage;
+    if (!parentMessage && !parentBranchNode) return;
+
+    let actualParentMessageId;
+    if (parentMessage) {
+      // 父节点是消息
+      actualParentMessageId = parentId;
+    } else if (parentBranchNode) {
+      // 父节点是分支节点，获取分支节点的父消息
+      actualParentMessageId = parentBranchNode.parentMessageId;
+    }
+
+    if (!actualParentMessageId || !conv.messages[actualParentMessageId]) return;
+
+    const actualParentMessage = conv.messages[actualParentMessageId];
+
+    // 找到对应的用户消息
+    let userMessage = actualParentMessage;
     if (userMessage.role !== 'user') {
       // 如果父消息不是用户消息，继续向上查找
-      let currentId = parentId;
+      let currentId = actualParentMessageId;
       while (currentId) {
         const msg = conv.messages[currentId];
         if (!msg) break;
@@ -2321,28 +2429,29 @@ async function retryMessage(btn) {
     if (userMessage.role !== 'user') return;
 
     // 检查是否已存在分支节点
-    let branchNode = findBranchNodeByParent(conv, parentId);
+    let branchNode = findBranchNodeByParent(conv, actualParentMessageId);
 
     if (!branchNode) {
       // 创建新的分支节点
       branchNode = {
         id: generateId16(),
-        parentId: parentId,
+        parentMessageId: actualParentMessageId,
         branches: [
           {
             id: generateId16(),
             firstMessageId: messageId,
-            order: 0
+            createdAt: Date.now()
           }
         ],
         activeChildId: messageId
       };
       conv.branchNodes[branchNode.id] = branchNode;
 
-      // 更新父消息的children（如果还没有）
-      if (!parentMessage.children.includes(messageId)) {
-        parentMessage.children.push(messageId);
-      }
+      // 修改：将父消息的children改为只包含分支节点ID
+      actualParentMessage.children = [branchNode.id];
+
+      // 修改：更新原AI消息的parentId为分支节点ID
+      conv.messages[messageId].parentId = branchNode.id;
     }
 
     // 创建新的AI消息（新分支）
@@ -2351,7 +2460,7 @@ async function retryMessage(btn) {
       id: newAIMessageId,
       role: 'assistant',
       content: '\n',  // 初始显示换行符
-      parentId: parentId,
+      parentId: branchNode.id,  // 修改：指向分支节点
       children: [],
       timestamp: Date.now()
     };
@@ -2362,16 +2471,11 @@ async function retryMessage(btn) {
     branchNode.branches.push({
       id: generateId16(),
       firstMessageId: newAIMessageId,
-      order: branchNode.branches.length
+      createdAt: Date.now()
     });
 
     // 更新activeChildId
     branchNode.activeChildId = newAIMessageId;
-
-    // 更新父消息的children
-    if (!parentMessage.children.includes(newAIMessageId)) {
-      parentMessage.children.push(newAIMessageId);
-    }
 
     // 保存并重新渲染
     await saveConv(conv);
@@ -2464,26 +2568,48 @@ function editMessage(btn) {
       const message = conv.messages[messageId];
       const parentId = message.parentId;
 
-      if (!parentId) return;
+      // 检查父节点是消息还是分支节点
+      const parentMessage = conv.messages[parentId];
+      const parentBranchNode = conv.branchNodes[parentId];
 
-      // 在该消息前创建分支节点
-      let branchNode = findBranchNodeByParent(conv, parentId);
+      if (!parentMessage && !parentBranchNode) return;
+
+      let actualParentMessageId;
+      if (parentMessage) {
+        actualParentMessageId = parentId;
+      } else if (parentBranchNode) {
+        actualParentMessageId = parentBranchNode.parentMessageId;
+      }
+
+      if (!actualParentMessageId) return;
+
+      // 在父消息下创建分支节点
+      let branchNode = findBranchNodeByParent(conv, actualParentMessageId);
 
       if (!branchNode) {
         // 创建新的分支节点
         branchNode = {
           id: generateId16(),
-          parentId: parentId,
+          parentMessageId: actualParentMessageId,
           branches: [
             {
               id: generateId16(),
               firstMessageId: messageId,
-              order: 0
+              createdAt: Date.now()
             }
           ],
           activeChildId: messageId
         };
         conv.branchNodes[branchNode.id] = branchNode;
+
+        // 修改：将父消息的children改为只包含分支节点ID
+        const actualParent = conv.messages[actualParentMessageId];
+        if (actualParent) {
+          actualParent.children = [branchNode.id];
+        }
+
+        // 修改：更新原消息的parentId为分支节点ID
+        conv.messages[messageId].parentId = branchNode.id;
       }
 
       // 创建新的用户消息（新分支）
@@ -2492,7 +2618,7 @@ function editMessage(btn) {
         id: newUserMessageId,
         role: message.role,
         content: newText,
-        parentId: parentId,
+        parentId: branchNode.id,  // 修改：指向分支节点
         children: [],
         timestamp: Date.now()
       };
@@ -2503,17 +2629,11 @@ function editMessage(btn) {
       branchNode.branches.push({
         id: generateId16(),
         firstMessageId: newUserMessageId,
-        order: branchNode.branches.length
+        createdAt: Date.now()
       });
 
       // 更新activeChildId
       branchNode.activeChildId = newUserMessageId;
-
-      // 更新父消息的children
-      const parentMessage = conv.messages[parentId];
-      if (!parentMessage.children.includes(newUserMessageId)) {
-        parentMessage.children.push(newUserMessageId);
-      }
 
       // 保存并重新渲染
       await saveConv(conv);
@@ -2563,9 +2683,18 @@ async function switchBranch(nodeId, direction) {
   // 更新activeChildId
   branchNode.activeChildId = branchNode.branches[newIndex].firstMessageId;
 
+  // 保存滚动位置
+  const m = g('messages');
+  const scrollPos = m.scrollTop;
+
   // 保存并重新渲染
   await saveConv(conv);
   await renderMessages();
+
+  // 恢复滚动位置
+  requestAnimationFrame(() => {
+    m.scrollTop = scrollPos;
+  });
 }
 
 /**
@@ -2587,15 +2716,21 @@ async function deleteBranch(nodeId) {
   const branchToDelete = branchNode.branches[currentIndex];
   const deleteMessagesRecursive = (msgId) => {
     const msg = conv.messages[msgId];
-    if (!msg) return;
+    const branchNodeChild = conv.branchNodes[msgId];
 
-    // 递归删除子消息
-    if (msg.children) {
-      msg.children.forEach(childId => deleteMessagesRecursive(childId));
+    if (msg) {
+      // 是消息，递归删除子节点
+      if (msg.children) {
+        msg.children.forEach(childId => deleteMessagesRecursive(childId));
+      }
+      delete conv.messages[msgId];
+    } else if (branchNodeChild) {
+      // 是分支节点，删除所有分支
+      branchNodeChild.branches.forEach(branch => {
+        deleteMessagesRecursive(branch.firstMessageId);
+      });
+      delete conv.branchNodes[msgId];
     }
-
-    // 删除消息
-    delete conv.messages[msgId];
   };
 
   deleteMessagesRecursive(branchToDelete.firstMessageId);
@@ -2603,22 +2738,36 @@ async function deleteBranch(nodeId) {
   // 从分支节点中移除该分支
   branchNode.branches.splice(currentIndex, 1);
 
-  // 如果只剩一个分支，删除分支节点
+  // 如果只剩一个分支，删除分支节点，恢复直接连接
   if (branchNode.branches.length === 1) {
     const remainingBranch = branchNode.branches[0];
-    const parentMessage = conv.messages[branchNode.parentId];
+    const parentMessage = conv.messages[branchNode.parentMessageId];
 
     if (parentMessage) {
-      // 将唯一分支的消息直接连接到父消息
-      parentMessage.children = [remainingBranch.firstMessageId];
+      // 修改：将父消息的children从分支节点ID改为消息ID
+      const nodeIndex = parentMessage.children.indexOf(nodeId);
+      if (nodeIndex !== -1) {
+        parentMessage.children[nodeIndex] = remainingBranch.firstMessageId;
+      }
 
+      // 修改：更新子消息的parentId从分支节点ID改为父消息ID
       const remainingMessage = conv.messages[remainingBranch.firstMessageId];
       if (remainingMessage) {
-        remainingMessage.parentId = branchNode.parentId;
+        remainingMessage.parentId = branchNode.parentMessageId;
       }
     }
 
     // 删除分支节点
+    delete conv.branchNodes[nodeId];
+  } else if (branchNode.branches.length === 0) {
+    // 没有分支了，删除分支节点
+    const parentMessage = conv.messages[branchNode.parentMessageId];
+    if (parentMessage) {
+      const nodeIndex = parentMessage.children.indexOf(nodeId);
+      if (nodeIndex !== -1) {
+        parentMessage.children.splice(nodeIndex, 1);
+      }
+    }
     delete conv.branchNodes[nodeId];
   } else {
     // 切换到前一个分支（或后一个）
@@ -2643,28 +2792,6 @@ function setGenerating(on) {
 function setStatus(s,t) {
   g('status-dot').className='status-dot '+s;
   g('status-text').textContent=t||s;
-}
-
-async function clearCurrentChat() {
-  if(isGenerating) return showToast('请先停止生成');
-
-  const convs = await getConvs();
-  const conv = convs.find(c => c.id === currentConvId);
-  if (!conv) return;
-
-  // 只保留系统消息
-  const systemMsgId = conv.rootMessageId;
-  const systemMsg = conv.messages[systemMsgId];
-
-  if (systemMsg) {
-    systemMsg.children = [];
-    conv.messages = { [systemMsgId]: systemMsg };
-    conv.branchNodes = {};
-  }
-
-  await saveConv(conv);
-  renderMessages();
-  showToast('对话已清空');
 }
 
 async function updateStats() {
@@ -2761,10 +2888,28 @@ function applyCollapseStates(states) {
   });
 }
 
-function toggleOpt(key) {
+async function toggleOpt(key) {
   if(key==='stream'){ streamEnabled=!streamEnabled; g('stream-toggle').classList.toggle('on',streamEnabled); }
-  if(key==='md'){     mdEnabled=!mdEnabled;         g('md-toggle').classList.toggle('on',mdEnabled); }
-  if(key==='hl'){     hlEnabled=!hlEnabled;         g('hl-toggle').classList.toggle('on',hlEnabled); }
+  if(key==='md'){
+    const m = g('messages');
+    const scrollPos = m.scrollTop;
+    mdEnabled=!mdEnabled;
+    g('md-toggle').classList.toggle('on',mdEnabled);
+    await renderMessages();
+    requestAnimationFrame(() => {
+      m.scrollTop = scrollPos;
+    });
+  }
+  if(key==='hl'){
+    const m = g('messages');
+    const scrollPos = m.scrollTop;
+    hlEnabled=!hlEnabled;
+    g('hl-toggle').classList.toggle('on',hlEnabled);
+    await renderMessages();
+    requestAnimationFrame(() => {
+      m.scrollTop = scrollPos;
+    });
+  }
   saveSettings();
 }
 
