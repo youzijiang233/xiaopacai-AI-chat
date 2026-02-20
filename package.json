@@ -1,7 +1,7 @@
 {
   "name": "ai-chat-app",
-  "version": "1.0.3",
-  "description": "AI Chat Application with Multi-API Support and Encrypted Storage",
+  "version": "1.1.0",
+  "description": "AI Chat Application with Tree-Based Conversation Management",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -11,9 +11,11 @@
   "keywords": [
     "ai",
     "chat",
-    "electron"
+    "electron",
+    "tree-conversation",
+    "branch-management"
   ],
-  "author": "",
+  "author": "youzijiang233",
   "license": "MIT",
   "devDependencies": {
     "electron": "^28.3.3",

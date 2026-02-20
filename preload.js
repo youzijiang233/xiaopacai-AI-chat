@@ -11,6 +11,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // 检查文件是否存在
   fileExists: (filename) => ipcRenderer.invoke('file-exists', filename),
 
+  // 列出文件夹中的所有文件
+  listFiles: (folderName) => ipcRenderer.invoke('list-files', folderName),
+
+  // 删除文件
+  deleteFile: (filename) => ipcRenderer.invoke('delete-file', filename),
+
+  // 确保文件夹存在
+  ensureFolder: (folderName) => ipcRenderer.invoke('ensure-folder', folderName),
+
   // 加密数据（使用系统级加密）
   encryptData: (plaintext) => ipcRenderer.invoke('encrypt-data', plaintext),
 

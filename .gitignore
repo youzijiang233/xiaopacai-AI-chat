@@ -1,5 +1,44 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
-*.log
+build/
+out/
+
+# Data files (user data should not be committed)
+data/*.json
+data/conversations/*.json
+
+# Keep data folder structure
+!data/.gitkeep
+!data/conversations/.gitkeep
+
+# Backup files
+*.backup
+
+# OS files
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.temp

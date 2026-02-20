@@ -81,6 +81,40 @@ ipcMain.handle('file-exists', async (event, filename) => {
   }
 });
 
+// IPC 处理器：列出文件夹中的所有文件
+ipcMain.handle('list-files', async (event, folderName) => {
+  try {
+    const folderPath = path.join(dataDir, folderName);
+    await fs.access(folderPath);
+    const files = await fs.readdir(folderPath);
+    return { success: true, files };
+  } catch (error) {
+    return { success: false, error: error.message, files: [] };
+  }
+});
+
+// IPC 处理器：删除文件
+ipcMain.handle('delete-file', async (event, filename) => {
+  try {
+    const filePath = path.join(dataDir, filename);
+    await fs.unlink(filePath);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// IPC 处理器：确保文件夹存在
+ipcMain.handle('ensure-folder', async (event, folderName) => {
+  try {
+    const folderPath = path.join(dataDir, folderName);
+    await fs.mkdir(folderPath, { recursive: true });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
 function createWindow() {
   mainWindow = new BrowserWindow({
     width: 1200,

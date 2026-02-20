@@ -88,6 +88,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .slider::-webkit-slider-thumb:hover{transform:scale(1.25)}
 .slider-val{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--accent);min-width:40px;text-align:right}
 
+/* RESET PARAMS BUTTON */
+.reset-params-btn{width:100%;padding:8px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text3);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s}
+.reset-params-btn:hover{background:var(--bg4);border-color:var(--accent);color:var(--accent)}
+.reset-params-btn svg{flex-shrink:0}
+
 /* TOGGLE */
 .toggle-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 11px}
 .toggle-info{display:flex;flex-direction:column;gap:2px}
@@ -123,6 +128,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .conv-del{width:20px;height:20px;border-radius:4px;border:none;background:transparent;color:var(--text3);display:none;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}
 .conv-item:hover .conv-del{display:flex}
 .conv-del:hover{background:rgba(224,92,108,.15);color:var(--red)}
+.conv-actions{display:none;align-items:center;gap:4px;flex-shrink:0}
+.conv-item:hover .conv-actions{display:flex}
+.conv-action-btn{width:20px;height:20px;border-radius:4px;border:none;background:transparent;color:var(--text3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.conv-action-btn:hover{background:var(--bg4);color:var(--text)}
 
 /* CHAT AREA */
 .chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
@@ -149,6 +158,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);hei
 .bubble-content{font-size:14px;line-height:1.7;color:var(--text)}
 .bubble-content.user-msg{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:9px 14px;white-space:pre-line;word-break:break-word}
 .bubble-content.ai-msg{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:9px 14px;word-break:break-word}
+
+/* BUBBLE ACTIONS */
+.bubble-actions{display:flex;gap:2px;margin-top:5px;opacity:0;visibility:hidden;min-height:24px}
+.message-row:hover .bubble-actions{opacity:1;visibility:visible}
+.bubble-action-btn{width:24px;height:24px;border-radius:5px;border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.bubble-action-btn:hover{background:var(--bg3);color:var(--text)}
+.bubble-action-btn.del:hover{background:rgba(224,92,108,.15);color:var(--red)}
+.bubble-action-btn svg{width:13px;height:13px}
+
+/* EDIT MODE */
+.bubble-edit-wrap{display:flex;flex-direction:column;gap:6px}
+.bubble-edit-textarea{background:var(--bg3);border:1px solid var(--accent);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;line-height:1.7;padding:9px 14px;resize:vertical;min-height:80px;outline:none;width:100%}
+.bubble-edit-textarea:focus{box-shadow:0 0 0 3px var(--accent-glow)}
+.bubble-edit-btns{display:flex;gap:6px;justify-content:flex-end}
+.bubble-edit-btn{padding:4px 12px;border-radius:6px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .15s}
+.bubble-edit-btn.cancel{background:transparent;color:var(--text2);border:1px solid var(--border)}
+.bubble-edit-btn.cancel:hover{background:var(--bg3)}
+.bubble-edit-btn.save{background:var(--bg3);color:var(--text);border:1px solid var(--border2)}
+.bubble-edit-btn.save:hover{border-color:var(--accent);color:var(--accent)}
+.bubble-edit-btn.regen{background:var(--accent);color:#fff}
+.bubble-edit-btn.regen:hover{background:var(--accent2)}
 
 /* Markdown */
 .bubble-content h1,.bubble-content h2,.bubble-content h3{color:var(--text);font-weight:600;margin:12px 0 5px;border-bottom:1px solid var(--border);padding-bottom:4px}
@@ -249,6 +279,14 @@ kbd{background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-
 .preset-new-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;cursor:pointer;color:var(--accent);font-size:12px;transition:background .12s}
 .preset-new-btn:hover{background:var(--bg4)}
 .preset-new-btn svg{width:13px;height:13px}
+
+/* BRANCH MANAGER */
+.branch-manager{display:flex;align-items:center;gap:0px;padding:0;background:transparent;border:none;font-size:11px;height:24px;opacity:0;visibility:hidden}
+.message-row:hover .branch-manager{opacity:1;visibility:visible}
+.branch-btn{width:24px;height:24px;border-radius:0;border:none;background:transparent;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s;font-size:16px;font-weight:400;padding:0;position:relative;z-index:2;transform:scaleY(1.25)}
+.branch-btn:hover:not(:disabled){color:var(--text)}
+.branch-btn:disabled{opacity:0.3;cursor:not-allowed}
+.branch-indicator{color:var(--text3);font-family:'DM Sans',sans-serif;font-size:13px;min-width:40px;text-align:center;-webkit-user-select:none;user-select:none;padding:0 4px;height:24px;display:flex;align-items:center;justify-content:center;background:transparent;margin:0 -14px}
 </style>
 </head>
 <body>
@@ -417,6 +455,12 @@ kbd{background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-
                 <span class="slider-val" id="top-a-val">0.000</span>
               </div>
             </div>
+            <div class="field" style="margin-top:12px">
+              <button class="reset-params-btn" onclick="resetGenerationParams()" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                重置所有参数
+              </button>
+            </div>
           </div>
 
           <div class="divider"></div>
@@ -525,13 +569,146 @@ kbd{background:var(--bg3);border:1px solid var(--border);padding:1px 5px;border-
 <script>
 // ══ STATE ══
 let currentConvId = null;
-let currentMessages = [];
 let isGenerating = false;
-let abortCtrl = null;
 let streamEnabled = true;
 let mdEnabled = true;
 let hlEnabled = true;
 let activePanel = 'settings';
+
+// ══ CONCURRENT REQUEST CONTROL ══
+const conversationControllers = new Map(); // convId -> AbortController
+
+// ══ ID GENERATORS ══
+function generateUniqueId() {
+  return 'c' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function generateId16() {
+  const timestamp = Date.now().toString(); // 13位时间戳
+  const random = Math.random().toString(36).substring(2, 5); // 3位随机字符
+  return timestamp + random; // 总共16位
+}
+
+// ══ TREE STRUCTURE HELPERS ══
+/**
+ * 查找指定父消息的分支节点
+ */
+function findBranchNodeByParent(conv, parentId) {
+  if (!conv || !conv.branchNodes) return null;
+  for (const nodeId in conv.branchNodes) {
+    const node = conv.branchNodes[nodeId];
+    if (node.parentId === parentId) {
+      return node;
+    }
+  }
+  return null;
+}
+
+/**
+ * 构建渲染路径（从根消息到叶子节点）
+ * 返回: { messages: Message[], branchPoints: Map<messageId, BranchNode> }
+ */
+function buildRenderPath(conv) {
+  const path = [];
+  const branchPoints = new Map();
+
+  if (!conv || !conv.messages || !conv.rootMessageId) {
+    return { messages: path, branchPoints };
+  }
+
+  let currentId = conv.rootMessageId;
+
+  while (currentId) {
+    const message = conv.messages[currentId];
+    if (!message) break;
+
+    path.push(message);
+
+    // 检查是否有分支节点
+    const branchNode = findBranchNodeByParent(conv, currentId);
+
+    if (branchNode) {
+      // 有分支节点，记录分支点位置（key为分支第一条消息ID）
+      branchPoints.set(branchNode.activeChildId, branchNode);
+      currentId = branchNode.activeChildId;
+    } else if (message.children && message.children.length === 1) {
+      // 只有一个子节点，直接跟随
+      currentId = message.children[0];
+    } else if (!message.children || message.children.length === 0) {
+      // 叶子节点，结束
+      break;
+    } else {
+      // 多个子节点但没有分支节点（数据异常）
+      console.error('Multiple children without branch node:', currentId);
+      break;
+    }
+  }
+
+  return { messages: path, branchPoints };
+}
+
+/**
+ * 验证对话数据的一致性
+ */
+function validateConversation(conv) {
+  const errors = [];
+
+  if (!conv) return ['Conversation is null'];
+  if (!conv.messages) return ['Messages object is missing'];
+  if (!conv.rootMessageId) return ['Root message ID is missing'];
+
+  // 检查根消息存在
+  if (!conv.messages[conv.rootMessageId]) {
+    errors.push('Root message not found: ' + conv.rootMessageId);
+  }
+
+  // 检查所有消息的父子关系
+  for (const msgId in conv.messages) {
+    const msg = conv.messages[msgId];
+
+    // 检查父消息存在
+    if (msg.parentId && !conv.messages[msg.parentId]) {
+      errors.push(`Message ${msgId}: parent ${msg.parentId} not found`);
+    }
+
+    // 检查子消息存在
+    if (msg.children) {
+      msg.children.forEach(childId => {
+        if (!conv.messages[childId]) {
+          errors.push(`Message ${msgId}: child ${childId} not found`);
+        }
+      });
+    }
+  }
+
+  // 检查分支节点
+  if (conv.branchNodes) {
+    for (const nodeId in conv.branchNodes) {
+      const node = conv.branchNodes[nodeId];
+
+      // 检查父消息存在
+      if (!conv.messages[node.parentId]) {
+        errors.push(`BranchNode ${nodeId}: parent ${node.parentId} not found`);
+      }
+
+      // 检查分支消息存在
+      if (node.branches) {
+        node.branches.forEach(branch => {
+          if (!conv.messages[branch.firstMessageId]) {
+            errors.push(`BranchNode ${nodeId}: branch message ${branch.firstMessageId} not found`);
+          }
+        });
+      }
+
+      // 检查activeChildId存在
+      if (!conv.messages[node.activeChildId]) {
+        errors.push(`BranchNode ${nodeId}: activeChild ${node.activeChildId} not found`);
+      }
+    }
+  }
+
+  return errors;
+}
 
 // ══ API PRESETS ══
 let apiPresets = [];
@@ -708,10 +885,18 @@ async function decryptText(encrypted) {
 }
 
 // ══ FILE STORAGE ══
-const FILES = { S:'settings.json', C:'conversations.json', A:'active.json' };
+const FILES = { S:'settings.json', A:'active.json' };
+const CONVERSATIONS_FOLDER = 'conversations';
 
 // 检查是否在 Electron 环境中
 const isElectron = typeof window.electronAPI !== 'undefined';
+
+// 生成对话文件名：标题_ID.json
+function getConvFileName(conv) {
+  // 清理标题，移除不合法的文件名字符
+  const cleanTitle = conv.title.replace(/[<>:"/\\|?*]/g, '_').substring(0, 50);
+  return `${CONVERSATIONS_FOLDER}/${cleanTitle}_${conv.id}.json`;
+}
 
 // 读取数据（优先使用文件存储，降级到 localStorage）
 async function getData(key) {
@@ -894,45 +1079,209 @@ function syncParam(el, valId, fmt) {
   saveSettings();
 }
 
-// ══ CONVERSATIONS ══
-async function getConvs() { return await getData('C') || []; }
-async function setConvs(v) { await setData('C', v); }
+// 重置所有生成参数到默认值
+function resetGenerationParams() {
+  // 默认值
+  const defaults = {
+    's-max-tokens': { value: 0, display: '∞' },
+    's-chat-memory': { value: 10, display: '10' },
+    's-temp': { value: 1, display: '1.000' },
+    's-top-p': { value: 1, display: '1.000' },
+    's-top-k': { value: 0, display: '0' },
+    's-freq-pen': { value: 0, display: '0.000' },
+    's-pres-pen': { value: 0, display: '0.000' },
+    's-rep-pen': { value: 1, display: '1.000' },
+    's-min-p': { value: 0, display: '0.000' },
+    's-top-a': { value: 0, display: '0.000' }
+  };
 
+  // 重置每个参数
+  for (const [id, config] of Object.entries(defaults)) {
+    const slider = g(id);
+    if (slider) {
+      slider.value = config.value;
+    }
+  }
+
+  // 更新显示值
+  g('max-tokens-val').textContent = '∞';
+  g('chat-memory-val').textContent = '10';
+  g('temp-val').textContent = '1.000';
+  g('top-p-val').textContent = '1.000';
+  g('top-k-val').textContent = '0';
+  g('freq-pen-val').textContent = '0.000';
+  g('pres-pen-val').textContent = '0.000';
+  g('rep-pen-val').textContent = '1.000';
+  g('min-p-val').textContent = '0.000';
+  g('top-a-val').textContent = '0.000';
+
+  saveSettings();
+  showToast('参数已重置');
+}
+
+// ══ CONVERSATIONS ══
+// 获取所有对话列表（从conversations文件夹读取所有对话文件）
+async function getConvs() {
+  if (isElectron) {
+    // 确保conversations文件夹存在
+    await window.electronAPI.ensureFolder(CONVERSATIONS_FOLDER);
+
+    // 列出所有对话文件
+    const result = await window.electronAPI.listFiles(CONVERSATIONS_FOLDER);
+    if (!result.success) return [];
+
+    const convs = [];
+    for (const filename of result.files) {
+      if (!filename.endsWith('.json')) continue;
+
+      const fileResult = await window.electronAPI.readData(`${CONVERSATIONS_FOLDER}/${filename}`);
+      if (fileResult.success) {
+        try {
+          const conv = JSON.parse(fileResult.data);
+          convs.push(conv);
+        } catch(e) {
+          console.error(`Failed to parse conversation file: ${filename}`, e);
+        }
+      }
+    }
+
+    // 按更新时间排序
+    convs.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+    return convs;
+  } else {
+    // localStorage降级
+    return await getData('C') || [];
+  }
+}
+
+// 保存单个对话到独立文件
+async function saveConv(conv) {
+  if (isElectron) {
+    await window.electronAPI.ensureFolder(CONVERSATIONS_FOLDER);
+    const filename = getConvFileName(conv);
+    const data = JSON.stringify(conv, null, 2);
+    await window.electronAPI.writeData(filename, data);
+  } else {
+    // localStorage降级：保存所有对话
+    const convs = await getData('C') || [];
+    const idx = convs.findIndex(c => c.id === conv.id);
+    if (idx >= 0) {
+      convs[idx] = conv;
+    } else {
+      convs.unshift(conv);
+    }
+    await setData('C', convs);
+  }
+}
+
+// 删除单个对话文件
+async function deleteConvFile(conv) {
+  if (isElectron) {
+    const filename = getConvFileName(conv);
+    await window.electronAPI.deleteFile(filename);
+  } else {
+    // localStorage降级
+    const convs = await getData('C') || [];
+    const filtered = convs.filter(c => c.id !== conv.id);
+    await setData('C', filtered);
+  }
+}
+
+// 兼容旧的setConvs（已废弃，保留用于迁移）
+async function setConvs(convs) {
+  if (isElectron) {
+    // 新逻辑：每个对话单独保存
+    for (const conv of convs) {
+      await saveConv(conv);
+    }
+  } else {
+    await setData('C', convs);
+  }
+}
+
+/**
+ * 保存当前对话（树状结构）
+ */
 async function saveCurrentConv() {
   if (!currentConvId) return;
   const convs = await getConvs();
-  const idx = convs.findIndex(c => c.id === currentConvId);
-  if (idx < 0) return;
-  convs[idx].messages = currentMessages;
-  convs[idx].updatedAt = Date.now();
-  const firstUser = currentMessages.find(m => m.role === 'user');
-  if (firstUser) convs[idx].title = firstUser.content.slice(0, 28) + (firstUser.content.length > 28 ? '…' : '');
-  await setConvs(convs);
+  const conv = convs.find(c => c.id === currentConvId);
+  if (!conv) return;
+
+  // 深拷贝整个对话对象
+  conv.messages = JSON.parse(JSON.stringify(conv.messages || {}));
+  conv.branchNodes = JSON.parse(JSON.stringify(conv.branchNodes || {}));
+  conv.updatedAt = Date.now();
+
+  // 更新标题（从第一条用户消息生成）
+  if (conv.rootMessageId && conv.messages[conv.rootMessageId]) {
+    const { messages } = buildRenderPath(conv);
+    const firstUser = messages.find(m => m.role === 'user');
+    if (firstUser) {
+      conv.title = firstUser.content.slice(0, 28) + (firstUser.content.length > 28 ? '…' : '');
+    }
+  }
+
+  // 保存单个对话文件
+  await saveConv(conv);
   renderConvList();
 }
 
+/**
+ * 创建新对话（树状结构）
+ */
 async function newChat(saveCurrent = true) {
   if (saveCurrent) await saveCurrentConv();
-  const id = 'c' + Date.now();
-  const convs = await getConvs();
-  convs.unshift({ id, title: '新对话', messages: [], createdAt: Date.now(), updatedAt: Date.now() });
-  await setConvs(convs);
+
+  const id = generateId16();
+  const systemMsgId = generateId16();
+
+  // 创建系统消息作为根节点
+  const systemMessage = {
+    id: systemMsgId,
+    role: 'system',
+    content: g('system-prompt').value || 'You are a helpful, accurate, and thoughtful AI assistant.',
+    parentId: null,
+    children: [],
+    timestamp: Date.now()
+  };
+
+  // 创建树状结构的对话对象
+  const newConv = {
+    id: id,
+    title: '新对话',
+    rootMessageId: systemMsgId,
+    messages: {
+      [systemMsgId]: systemMessage
+    },
+    branchNodes: {},
+    createdAt: Date.now(),
+    updatedAt: Date.now()
+  };
+
+  // 保存新对话
+  await saveConv(newConv);
+
   currentConvId = id;
-  currentMessages = [];
   await setData('A', id);
+
   renderMessages();
   renderConvList();
   updateStats();
 }
 
+/**
+ * 加载对话（树状结构）
+ */
 async function loadConv(id) {
   await saveCurrentConv();
   const convs = await getConvs();
   const conv = convs.find(c => c.id === id);
   if (!conv) return;
+
   currentConvId = id;
-  currentMessages = conv.messages || [];
   await setData('A', id);
+
   renderMessages();
   renderConvList();
   updateStats();
@@ -942,13 +1291,164 @@ async function loadConv(id) {
 async function deleteConv(id, e) {
   e && e.stopPropagation();
   const convs = await getConvs();
-  let filtered = convs.filter(c => c.id !== id);
-  await setConvs(filtered);
+  const conv = convs.find(c => c.id === id);
+  if (!conv) return;
+
+  // 删除对话文件
+  await deleteConvFile(conv);
+
   if (currentConvId === id) {
-    if (filtered.length > 0) await loadConv(filtered[0].id);
+    const remaining = await getConvs();
+    if (remaining.length > 0) await loadConv(remaining[0].id);
     else await newChat(false);
-  } else renderConvList();
+  } else {
+    renderConvList();
+  }
   showToast('已删除');
+}
+
+// 开始重命名对话（就地编辑）
+function startRenameConv(e, id) {
+  e && e.stopPropagation();
+  const titleEl = g('conv-title-' + id);
+  if (!titleEl) return;
+
+  // 获取当前对话
+  getConvs().then(convs => {
+    const conv = convs.find(c => c.id === id);
+    if (!conv) return;
+
+    const oldTitle = conv.title;
+    const input = document.createElement('input');
+    input.className = 'conv-title-input';
+    input.value = oldTitle;
+    input.style.cssText = 'width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-size:13px;color:var(--text);outline:none;font-family:inherit';
+
+    titleEl.replaceWith(input);
+    input.focus();
+    input.select();
+
+    let saved = false;
+    const finish = async () => {
+      if (saved) return;
+      saved = true;
+      const newTitle = input.value.trim() || oldTitle;
+
+      if (newTitle !== oldTitle) {
+        // 删除旧文件
+        await deleteConvFile(conv);
+
+        // 更新标题
+        conv.title = newTitle;
+        conv.updatedAt = Date.now();
+
+        // 保存新文件
+        await saveConv(conv);
+
+        showToast('已重命名');
+      }
+
+      renderConvList();
+    };
+
+    input.addEventListener('keydown', ev => {
+      if (ev.key === 'Enter') {
+        ev.preventDefault();
+        finish();
+      }
+      if (ev.key === 'Escape') {
+        saved = true;
+        renderConvList();
+      }
+    });
+    input.addEventListener('blur', finish);
+  });
+}
+
+// 复制对话
+async function duplicateConv(id, e) {
+  e && e.stopPropagation();
+  const convs = await getConvs();
+  const conv = convs.find(c => c.id === id);
+  if (!conv) return;
+
+  // 深拷贝对话对象
+  const newConv = JSON.parse(JSON.stringify(conv));
+
+  // 生成新的对话ID
+  const newConvId = generateId16();
+  newConv.id = newConvId;
+  newConv.title = conv.title + ' (副本)';
+  newConv.createdAt = Date.now();
+  newConv.updatedAt = Date.now();
+
+  // 创建ID映射表（保留时间戳部分，只改随机部分）
+  const idMap = {};
+
+  // 为所有消息生成新ID
+  const newMessages = {};
+  for (const msgId in newConv.messages) {
+    const oldMsg = newConv.messages[msgId];
+    // 提取时间戳部分（前13位）
+    const timestamp = msgId.substring(0, 13);
+    // 生成新的随机部分（3位）
+    const random = Math.random().toString(36).substring(2, 5);
+    const newMsgId = timestamp + random;
+
+    idMap[msgId] = newMsgId;
+    newMessages[newMsgId] = { ...oldMsg, id: newMsgId };
+  }
+
+  // 更新消息的parentId和children引用
+  for (const newMsgId in newMessages) {
+    const msg = newMessages[newMsgId];
+    if (msg.parentId && idMap[msg.parentId]) {
+      msg.parentId = idMap[msg.parentId];
+    }
+    if (msg.children && msg.children.length > 0) {
+      msg.children = msg.children.map(childId => idMap[childId] || childId);
+    }
+  }
+
+  // 更新rootMessageId
+  if (newConv.rootMessageId && idMap[newConv.rootMessageId]) {
+    newConv.rootMessageId = idMap[newConv.rootMessageId];
+  }
+
+  // 为所有分支节点生成新ID
+  const newBranchNodes = {};
+  const branchNodeIdMap = {};
+
+  for (const nodeId in newConv.branchNodes) {
+    const oldNode = newConv.branchNodes[nodeId];
+    // 提取时间戳部分
+    const timestamp = nodeId.substring(0, 13);
+    const random = Math.random().toString(36).substring(2, 5);
+    const newNodeId = timestamp + random;
+
+    branchNodeIdMap[nodeId] = newNodeId;
+
+    newBranchNodes[newNodeId] = {
+      ...oldNode,
+      id: newNodeId,
+      parentId: idMap[oldNode.parentId] || oldNode.parentId,
+      activeChildId: idMap[oldNode.activeChildId] || oldNode.activeChildId,
+      branches: oldNode.branches.map(branch => ({
+        ...branch,
+        id: generateId16(), // 分支记录也生成新ID
+        firstMessageId: idMap[branch.firstMessageId] || branch.firstMessageId
+      }))
+    };
+  }
+
+  newConv.messages = newMessages;
+  newConv.branchNodes = newBranchNodes;
+
+  // 保存新对话
+  await saveConv(newConv);
+
+  renderConvList();
+  showToast('已复制');
 }
 
 async function renderConvList() {
@@ -958,40 +1458,91 @@ async function renderConvList() {
   list.innerHTML = convs.map(c => {
     const d = new Date(c.updatedAt);
     const meta = d.toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'}) + ' ' + d.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+
+    // 计算消息数量（排除system消息）
+    let msgCount = 0;
+    if (c.messages) {
+      for (const msgId in c.messages) {
+        if (c.messages[msgId].role !== 'system') {
+          msgCount++;
+        }
+      }
+    }
+
     return `<div class="conv-item${c.id===currentConvId?' active':''}" onclick="loadConv('${c.id}')">
       <div class="conv-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
       <div class="conv-info">
-        <div class="conv-title">${escapeHtml(c.title)}</div>
-        <div class="conv-meta">${c.messages.filter(m=>m.role!=='system').length} 条 · ${meta}</div>
+        <div class="conv-title" id="conv-title-${c.id}">${escapeHtml(c.title)}</div>
+        <div class="conv-meta">${msgCount} 条 · ${meta}</div>
       </div>
-      <button class="conv-del" onclick="deleteConv('${c.id}',event)" title="删除">
-        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <div class="conv-actions">
+        <button class="conv-action-btn" onclick="startRenameConv(event,'${c.id}')" title="重命名">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="conv-action-btn" onclick="duplicateConv('${c.id}',event)" title="复制">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+        <button class="conv-del" onclick="deleteConv('${c.id}',event)" title="删除">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
     </div>`;
   }).join('');
 }
 
 // ══ RENDER MESSAGES ══
-function renderMessages() {
+/**
+ * 渲染消息树（树状结构）
+ */
+async function renderMessages() {
   const container = g('messages');
-  if (!currentMessages.filter(m=>m.role!=='system').length) {
+
+  if (!currentConvId) {
     container.innerHTML = `<div class="empty-state" id="empty-state"><div class="empty-icon">✦</div><div class="empty-title">开始对话</div><div class="empty-sub">在下方输入你的问题</div></div>`;
     return;
   }
+
+  const convs = await getConvs();
+  const conv = convs.find(c => c.id === currentConvId);
+
+  if (!conv || !conv.messages) {
+    container.innerHTML = `<div class="empty-state" id="empty-state"><div class="empty-icon">✦</div><div class="empty-title">开始对话</div><div class="empty-sub">在下方输入你的问题</div></div>`;
+    return;
+  }
+
+  // 构建渲染路径
+  const { messages, branchPoints } = buildRenderPath(conv);
+
+  // 过滤掉system消息
+  const visibleMessages = messages.filter(m => m.role !== 'system');
+
+  if (visibleMessages.length === 0) {
+    container.innerHTML = `<div class="empty-state" id="empty-state"><div class="empty-icon">✦</div><div class="empty-title">开始对话</div><div class="empty-sub">在下方输入你的问题</div></div>`;
+    return;
+  }
+
   container.innerHTML = '';
-  currentMessages.forEach(m => { if(m.role!=='system') appendBubble(m.role, m.content); });
+
+  // 渲染每条消息
+  visibleMessages.forEach(msg => {
+    appendBubble(msg.role, msg.content, false, msg.id, branchPoints.get(msg.id));
+  });
 }
 
 // ══ SEND / STOP ══
 function handleSendBtn() {
-  if (isGenerating) { if(abortCtrl) abortCtrl.abort(); }
-  else sendMessage();
+  if (isGenerating) {
+    const controller = conversationControllers.get(currentConvId);
+    if (controller) controller.abort();
+  } else {
+    sendMessage();
+  }
 }
 
-async function sendMessage() {
+async function sendMessage(retryText = null, isRetry = false) {
   if (isGenerating) return;
   const input = g('user-input');
-  const text = input.value.trim();
+  const text = retryText || input.value.trim();
   if (!text) return;
 
   // 验证 API Key 格式
@@ -1001,52 +1552,133 @@ async function sendMessage() {
     return;
   }
 
-  if (!currentConvId) newChat(false);
+  if (!currentConvId) await newChat(false);
 
   const es = g('empty-state');
   if (es) es.remove();
 
-  appendBubble('user', text);
-  currentMessages.push({ role: 'user', content: text });
-  input.value = ''; autoResize(input); updateCharCount(); updateStats();
+  // 获取当前对话
+  const convs = await getConvs();
+  const conv = convs.find(c => c.id === currentConvId);
+  if (!conv) return;
 
-  const aiRow = appendBubble('assistant', '', true);
+  // 创建用户消息
+  const userMessageId = generateId16();
+  const userMessage = {
+    id: userMessageId,
+    role: 'user',
+    content: text,
+    parentId: null,
+    children: [],
+    timestamp: Date.now()
+  };
+
+  // 找到当前路径的最后一条消息
+  const { messages: pathMessages } = buildRenderPath(conv);
+  const lastMessage = pathMessages[pathMessages.length - 1];
+
+  if (lastMessage) {
+    userMessage.parentId = lastMessage.id;
+    lastMessage.children.push(userMessageId);
+  }
+
+  conv.messages[userMessageId] = userMessage;
+
+  // 创建AI消息
+  const aiMessageId = generateId16();
+  const aiMessage = {
+    id: aiMessageId,
+    role: 'assistant',
+    content: '\n',  // 初始显示换行符
+    parentId: userMessageId,
+    children: [],
+    timestamp: Date.now()
+  };
+
+  conv.messages[aiMessageId] = aiMessage;
+  userMessage.children.push(aiMessageId);
+
+  // 保存当前对话
+  await saveConv(conv);
+  await renderMessages();
+
+  if (!isRetry) {
+    input.value = '';
+    autoResize(input);
+    updateCharCount();
+  }
+
+  // 找到AI消息的DOM元素
+  const rows = document.querySelectorAll('.message-row');
+  const aiRow = Array.from(rows).find(r => r.dataset.messageId === aiMessageId);
+  if (!aiRow) return;
+
   const contentEl = aiRow.querySelector('.bubble-content');
+  // 显示跳动光标，表示AI正在思考
+  contentEl.innerHTML = '<span class="typing-cursor"></span>';
   setGenerating(true);
 
-  // Read params
+  // 读取参数
   const preset = getActivePreset();
-  const apiUrl  = preset.url.trim();
-  const apiKey  = (fullApiKey || '').trim();
-  const model   = preset.model.trim();
-  const format  = preset.format || 'openai';
-  const sysP    = g('system-prompt').value.trim();
+  const apiUrl = preset.url.trim();
+  const apiKey = (fullApiKey || '').trim();
+  const model = preset.model.trim();
+  const format = preset.format || 'openai';
+  const sysP = g('system-prompt').value.trim();
   const chatMemory = parseInt(g('s-chat-memory').value) || 0;
-  const mt      = parseInt(g('s-max-tokens').value);
-  const temp    = parseFloat(g('s-temp').value);
-  const topP    = parseFloat(g('s-top-p').value);
-  const topK    = parseInt(g('s-top-k').value);
+  const mt = parseInt(g('s-max-tokens').value);
+  const temp = parseFloat(g('s-temp').value);
+  const topP = parseFloat(g('s-top-p').value);
+  const topK = parseInt(g('s-top-k').value);
   const freqPen = parseFloat(g('s-freq-pen').value);
   const presPen = parseFloat(g('s-pres-pen').value);
-  const repPen  = parseFloat(g('s-rep-pen').value);
-  const minP    = parseFloat(g('s-min-p').value);
-  const topA    = parseFloat(g('s-top-a').value);
+  const repPen = parseFloat(g('s-rep-pen').value);
+  const minP = parseFloat(g('s-min-p').value);
+  const topA = parseFloat(g('s-top-a').value);
 
-  abortCtrl = new AbortController();
+  // 使用对话级别的AbortController
+  const oldController = conversationControllers.get(currentConvId);
+  if (oldController) {
+    oldController.abort();
+  }
+  const controller = new AbortController();
+  conversationControllers.set(currentConvId, controller);
+
   let fullText = '';
 
   try {
-    setStatus('yellow','生成中…');
+    setStatus('yellow', '生成中…');
 
-    // Prepare request based on API format
+    // 构建消息历史（从根节点到用户消息）
+    const messageHistory = [];
+    let currentId = conv.rootMessageId;
+
+    while (currentId && currentId !== aiMessageId) {
+      const msg = conv.messages[currentId];
+      if (!msg) break;
+
+      if (msg.role !== 'system') {
+        messageHistory.push({ role: msg.role, content: msg.content });
+      }
+
+      // 查找下一个消息
+      const branchNode = findBranchNodeByParent(conv, currentId);
+      if (branchNode) {
+        currentId = branchNode.activeChildId;
+      } else if (msg.children && msg.children.length > 0) {
+        currentId = msg.children[0];
+      } else {
+        break;
+      }
+    }
+
+    // 应用chat memory限制
+    const sliced = chatMemory > 0 ? messageHistory.slice(-(chatMemory * 2)) : messageHistory;
+
+    // 准备请求
     let headers, body;
 
-    // Apply chat memory limit (slice to last N rounds = 2N messages)
-    const nonSysMsgs = currentMessages.filter(m => m.role !== 'system');
-    const sliced = chatMemory > 0 ? nonSysMsgs.slice(-(chatMemory * 2)) : nonSysMsgs;
-
     if (format === 'claude') {
-      // Claude API format
       headers = {
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
@@ -1063,74 +1695,89 @@ async function sendMessage() {
       };
       if (sysP) body.system = sysP;
     } else {
-      // OpenAI-compatible format
       headers = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${apiKey}`
       };
       const messages = [];
-      if (sysP) messages.push({ role:'system', content:sysP });
+      if (sysP) messages.push({ role: 'system', content: sysP });
       messages.push(...sliced);
 
       body = { model, messages, temperature: temp, top_p: topP, frequency_penalty: freqPen, presence_penalty: presPen, repetition_penalty: repPen, stream: streamEnabled };
-      if (mt > 0)   body.max_tokens = mt;
+      if (mt > 0) body.max_tokens = mt;
       if (topK > 0) body.top_k = topK;
       if (minP > 0) body.min_p = minP;
       if (topA > 0) body.top_a = topA;
     }
 
     const res = await fetch(apiUrl, {
-      method:'POST',
+      method: 'POST',
       headers,
       body: JSON.stringify(body),
-      signal: abortCtrl.signal,
+      signal: controller.signal,
     });
-    if (!res.ok) { const err = await res.text(); throw new Error(`HTTP ${res.status}: ${err}`); }
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`HTTP ${res.status}: ${err}`);
+    }
 
     if (streamEnabled) {
       const reader = res.body.getReader();
       const dec = new TextDecoder();
       let buf = '';
+      let isFirstToken = true;  // 标记是否是第一个token
 
       if (format === 'claude') {
-        while(true) {
-          const {done, value} = await reader.read();
-          if(done) break;
-          buf += dec.decode(value, {stream:true});
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
           const lines = buf.split('\n');
           buf = lines.pop();
-          for(const line of lines) {
+          for (const line of lines) {
             const t = line.trim();
-            if(!t.startsWith('data: ')) continue;
+            if (!t.startsWith('data: ')) continue;
             const d = t.slice(6);
             try {
               const chunk = JSON.parse(d);
               if (chunk.type === 'content_block_delta' && chunk.delta?.text) {
+                if (isFirstToken) {
+                  fullText = '';  // 清空初始的换行符
+                  isFirstToken = false;
+                }
                 fullText += chunk.delta.text;
                 contentEl.innerHTML = renderMd(fullText) + '<span class="typing-cursor"></span>';
                 scrollToBottom();
               }
-            } catch(e){}
+            } catch (e) { }
           }
         }
       } else {
-        // OpenAI streaming format
-        while(true) {
-          const {done, value} = await reader.read();
-          if(done) break;
-          buf += dec.decode(value, {stream:true});
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
           const lines = buf.split('\n');
           buf = lines.pop();
-          for(const line of lines) {
+          for (const line of lines) {
             const t = line.trim();
-            if(!t.startsWith('data: ')) continue;
+            if (!t.startsWith('data: ')) continue;
             const d = t.slice(6);
-            if(d==='[DONE]') break;
+            if (d === '[DONE]') break;
             try {
               const chunk = JSON.parse(d);
-              const delta = chunk.choices?.[0]?.delta?.content||'';
-              if(delta){ fullText+=delta; contentEl.innerHTML=renderMd(fullText)+'<span class="typing-cursor"></span>'; scrollToBottom(); }
-            } catch(e){}
+              const delta = chunk.choices?.[0]?.delta?.content || '';
+              if (delta) {
+                if (isFirstToken) {
+                  fullText = '';  // 清空初始的换行符
+                  isFirstToken = false;
+                }
+                fullText += delta;
+                contentEl.innerHTML = renderMd(fullText) + '<span class="typing-cursor"></span>';
+                scrollToBottom();
+              }
+            } catch (e) { }
           }
         }
       }
@@ -1145,36 +1792,334 @@ async function sendMessage() {
       contentEl.innerHTML = renderMd(fullText);
     }
 
-    currentMessages.push({ role:'assistant', content:fullText });
-    saveCurrentConv(); updateStats(); setStatus('green','就绪');
+    aiMessage.content = fullText;
+    const updatedConvs = await getConvs();
+    const updatedConv = updatedConvs.find(c => c.id === currentConvId);
+    if (updatedConv && updatedConv.messages[aiMessageId]) {
+      updatedConv.messages[aiMessageId].content = fullText;
+      await saveConv(updatedConv);
+    }
 
-  } catch(err) {
-    if(err.name==='AbortError') {
-      if(fullText) {
+    setStatus('green', '就绪');
+
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      if (fullText) {
         contentEl.innerHTML = renderMd(fullText) + '<span class="stop-marker">[ 已停止 ]</span>';
-        currentMessages.push({ role:'assistant', content:fullText });
-        saveCurrentConv(); updateStats();
-      } else { aiRow.remove(); }
-      setStatus('green','就绪');
+        aiMessage.content = fullText;
+        const updatedConvs = await getConvs();
+        const updatedConv = updatedConvs.find(c => c.id === currentConvId);
+        if (updatedConv && updatedConv.messages[aiMessageId]) {
+          updatedConv.messages[aiMessageId].content = fullText;
+          await saveConv(updatedConv);
+        }
+      } else {
+        aiRow.remove();
+      }
+      setStatus('green', '就绪');
     } else {
       contentEl.innerHTML = `<div class="error-bubble">⚠ ${escapeHtml(err.message)}</div>`;
-      setStatus('red','出错'); setTimeout(()=>setStatus('green','就绪'),4000);
+      setStatus('red', '出错');
+      setTimeout(() => setStatus('green', '就绪'), 4000);
     }
+  } finally {
+    conversationControllers.delete(currentConvId);
+    setGenerating(false);
+    scrollToBottom();
   }
-  setGenerating(false); scrollToBottom();
+}
+
+/**
+ * 发送消息到树状结构（用于retry和edit-regen）
+ * @param {string} userText - 用户消息内容
+ * @param {string} aiMessageId - AI消息ID（已创建但内容为空）
+ */
+async function sendMessageToTree(userText, aiMessageId) {
+  if (isGenerating) return;
+
+  const convs = await getConvs();
+  const conv = convs.find(c => c.id === currentConvId);
+  if (!conv || !conv.messages[aiMessageId]) return;
+
+  const aiMessage = conv.messages[aiMessageId];
+
+  // 重新渲染以显示空的AI消息
+  await renderMessages();
+
+  const rows = document.querySelectorAll('.message-row');
+  const aiRow = Array.from(rows).find(r => r.dataset.messageId === aiMessageId);
+  if (!aiRow) return;
+
+  const contentEl = aiRow.querySelector('.bubble-content');
+  // 显示跳动光标，表示AI正在思考
+  contentEl.innerHTML = '<span class="typing-cursor"></span>';
+  setGenerating(true);
+
+  // 读取参数
+  const preset = getActivePreset();
+  const apiUrl = preset.url.trim();
+  const apiKey = (fullApiKey || '').trim();
+  const model = preset.model.trim();
+  const format = preset.format || 'openai';
+  const sysP = g('system-prompt').value.trim();
+  const chatMemory = parseInt(g('s-chat-memory').value) || 0;
+  const mt = parseInt(g('s-max-tokens').value);
+  const temp = parseFloat(g('s-temp').value);
+  const topP = parseFloat(g('s-top-p').value);
+  const topK = parseInt(g('s-top-k').value);
+  const freqPen = parseFloat(g('s-freq-pen').value);
+  const presPen = parseFloat(g('s-pres-pen').value);
+  const repPen = parseFloat(g('s-rep-pen').value);
+  const minP = parseFloat(g('s-min-p').value);
+  const topA = parseFloat(g('s-top-a').value);
+
+  // 使用对话级别的AbortController
+  const oldController = conversationControllers.get(currentConvId);
+  if (oldController) {
+    oldController.abort();
+  }
+  const controller = new AbortController();
+  conversationControllers.set(currentConvId, controller);
+
+  let fullText = '';
+
+  try {
+    setStatus('yellow', '生成中…');
+
+    // 构建消息历史（从根节点到当前AI消息的父节点）
+    const messageHistory = [];
+    let currentId = conv.rootMessageId;
+
+    while (currentId && currentId !== aiMessageId) {
+      const msg = conv.messages[currentId];
+      if (!msg) break;
+
+      if (msg.role !== 'system') {
+        messageHistory.push({ role: msg.role, content: msg.content });
+      }
+
+      // 查找下一个消息
+      const branchNode = findBranchNodeByParent(conv, currentId);
+      if (branchNode) {
+        currentId = branchNode.activeChildId;
+      } else if (msg.children && msg.children.length > 0) {
+        currentId = msg.children[0];
+      } else {
+        break;
+      }
+    }
+
+    // 应用chat memory限制
+    const sliced = chatMemory > 0 ? messageHistory.slice(-(chatMemory * 2)) : messageHistory;
+
+    // 准备请求
+    let headers, body;
+
+    if (format === 'claude') {
+      headers = {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01'
+      };
+      body = {
+        model,
+        max_tokens: mt > 0 ? mt : 4096,
+        temperature: temp,
+        top_p: topP,
+        top_k: topK > 0 ? topK : undefined,
+        stream: streamEnabled,
+        messages: sliced.map(m => ({ role: m.role, content: m.content }))
+      };
+      if (sysP) body.system = sysP;
+    } else {
+      headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      };
+      const messages = [];
+      if (sysP) messages.push({ role: 'system', content: sysP });
+      messages.push(...sliced);
+
+      body = { model, messages, temperature: temp, top_p: topP, frequency_penalty: freqPen, presence_penalty: presPen, repetition_penalty: repPen, stream: streamEnabled };
+      if (mt > 0) body.max_tokens = mt;
+      if (topK > 0) body.top_k = topK;
+      if (minP > 0) body.min_p = minP;
+      if (topA > 0) body.top_a = topA;
+    }
+
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`HTTP ${res.status}: ${err}`);
+    }
+
+    if (streamEnabled) {
+      const reader = res.body.getReader();
+      const dec = new TextDecoder();
+      let buf = '';
+      let isFirstToken = true;  // 标记是否是第一个token
+
+      if (format === 'claude') {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          const lines = buf.split('\n');
+          buf = lines.pop();
+          for (const line of lines) {
+            const t = line.trim();
+            if (!t.startsWith('data: ')) continue;
+            const d = t.slice(6);
+            try {
+              const chunk = JSON.parse(d);
+              if (chunk.type === 'content_block_delta' && chunk.delta?.text) {
+                if (isFirstToken) {
+                  fullText = '';  // 清空初始的换行符
+                  isFirstToken = false;
+                }
+                fullText += chunk.delta.text;
+                contentEl.innerHTML = renderMd(fullText) + '<span class="typing-cursor"></span>';
+                scrollToBottom();
+              }
+            } catch (e) { }
+          }
+        }
+      } else {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buf += dec.decode(value, { stream: true });
+          const lines = buf.split('\n');
+          buf = lines.pop();
+          for (const line of lines) {
+            const t = line.trim();
+            if (!t.startsWith('data: ')) continue;
+            const d = t.slice(6);
+            if (d === '[DONE]') break;
+            try {
+              const chunk = JSON.parse(d);
+              const delta = chunk.choices?.[0]?.delta?.content;
+              if (delta) {
+                if (isFirstToken) {
+                  fullText = '';  // 清空初始的换行符
+                  isFirstToken = false;
+                }
+                fullText += delta;
+                contentEl.innerHTML = renderMd(fullText) + '<span class="typing-cursor"></span>';
+                scrollToBottom();
+              }
+            } catch (e) { }
+          }
+        }
+      }
+    } else {
+      const data = await res.json();
+      fullText = format === 'claude' ? data.content?.[0]?.text || '' : data.choices?.[0]?.message?.content || '';
+    }
+
+    contentEl.innerHTML = renderMd(fullText);
+    aiMessage.content = fullText;
+
+    const updatedConvs = await getConvs();
+    const updatedConv = updatedConvs.find(c => c.id === currentConvId);
+    if (updatedConv && updatedConv.messages[aiMessageId]) {
+      updatedConv.messages[aiMessageId].content = fullText;
+      await setConvs(updatedConvs);
+    }
+
+    setStatus('green', '就绪');
+
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      if (fullText) {
+        contentEl.innerHTML = renderMd(fullText) + '<span class="stop-marker">[ 已停止 ]</span>';
+        aiMessage.content = fullText;
+        const updatedConvs = await getConvs();
+        const updatedConv = updatedConvs.find(c => c.id === currentConvId);
+        if (updatedConv && updatedConv.messages[aiMessageId]) {
+          updatedConv.messages[aiMessageId].content = fullText;
+          await saveConv(updatedConv);
+        }
+      } else {
+        aiRow.remove();
+      }
+      setStatus('green', '就绪');
+    } else {
+      contentEl.innerHTML = `<div class="error-bubble">⚠ ${escapeHtml(err.message)}</div>`;
+      setStatus('red', '出错');
+      setTimeout(() => setStatus('green', '就绪'), 4000);
+    }
+  } finally {
+    conversationControllers.delete(currentConvId);
+    setGenerating(false);
+    scrollToBottom();
+  }
 }
 
 // ══ DOM HELPERS ══
 function g(id){ return document.getElementById(id); }
 
-function appendBubble(role, text, empty=false) {
+/**
+ * 添加消息气泡（支持分支管理）
+ * @param {string} role - 消息角色
+ * @param {string} text - 消息内容
+ * @param {boolean} empty - 是否为空气泡（显示输入光标）
+ * @param {string} messageId - 消息ID
+ * @param {object} branchNode - 分支节点（如果该消息是分支的第一条消息）
+ */
+function appendBubble(role, text, empty=false, messageId=null, branchNode=null) {
   const isUser = role==='user';
   const row = document.createElement('div');
   row.className = 'message-row' + (isUser ? ' user-row' : '');
+
+  if (messageId) {
+    row.dataset.messageId = messageId;
+  }
+
+  // 构建分支管理按钮（如果有分支节点）
+  let branchManager = '';
+  if (branchNode && branchNode.branches && branchNode.branches.length >= 2) {
+    const currentIndex = branchNode.branches.findIndex(b => b.firstMessageId === branchNode.activeChildId);
+    const totalBranches = branchNode.branches.length;
+
+    branchManager = `
+      <div class="branch-manager" data-node-id="${branchNode.id}">
+        <button class="branch-btn" onclick="switchBranch('${branchNode.id}', -1)" ${currentIndex === 0 ? 'disabled' : ''} title="上一个分支"><</button>
+        <span class="branch-indicator">${currentIndex + 1}/${totalBranches}</span>
+        <button class="branch-btn" onclick="switchBranch('${branchNode.id}', 1)" ${currentIndex === totalBranches - 1 ? 'disabled' : ''} title="下一个分支">></button>
+      </div>`;
+  }
+
+  // 构建操作按钮（AI和用户消息都有）
+  // 用户消息：分支管理在左边，操作按钮在右边
+  // AI消息：操作按钮在左边，分支管理在右边
+  const actions = isUser ? `
+    <div class="bubble-actions">
+      ${branchManager}
+      <button class="bubble-action-btn" title="重试" onclick="retryMessage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg></button>
+      <button class="bubble-action-btn" title="复制" onclick="copyMessage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      <button class="bubble-action-btn" title="编辑" onclick="editMessage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="bubble-action-btn del" title="删除" onclick="deleteMessage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+    </div>` : `
+    <div class="bubble-actions">
+      <button class="bubble-action-btn" title="重试" onclick="retryMessage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg></button>
+      <button class="bubble-action-btn" title="复制" onclick="copyMessage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+      <button class="bubble-action-btn" title="编辑" onclick="editMessage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="bubble-action-btn del" title="删除" onclick="deleteMessage(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+      ${branchManager}
+    </div>`;
+
   row.innerHTML = `<div class="avatar ${role}">${isUser?'U':'AI'}</div>
     <div class="bubble">
       <div class="bubble-name ${isUser?'user-name':'ai-name'}">${isUser?'你':'DeepSeek'}</div>
       <div class="bubble-content ${isUser?'user-msg':'ai-msg'}">${empty?'<span class="typing-cursor"></span>':(isUser?escapeHtml(text):renderMd(text))}</div>
+      ${actions}
     </div>`;
   g('messages').appendChild(row);
   scrollToBottom();
@@ -1182,6 +2127,509 @@ function appendBubble(role, text, empty=false) {
 }
 
 function scrollToBottom(){ const m=g('messages'); m.scrollTop=m.scrollHeight; }
+
+// ========== BUBBLE ACTIONS ==========
+function copyMessage(btn) {
+  const row = btn.closest('.message-row');
+  const content = row.querySelector('.bubble-content');
+  const text = content.textContent.trim();
+  navigator.clipboard.writeText(text).then(()=>{
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+    setTimeout(()=>{
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+    }, 1200);
+  });
+}
+
+/**
+ * 删除消息（树状结构）
+ */
+async function deleteMessage(btn) {
+  if (isGenerating) return;
+  const row = btn.closest('.message-row');
+  const messageId = row.dataset.messageId;
+  if (!messageId) return;
+
+  const convs = await getConvs();
+  const conv = convs.find(c => c.id === currentConvId);
+  if (!conv || !conv.messages[messageId]) return;
+
+  const message = conv.messages[messageId];
+  const parentId = message.parentId;
+  const children = message.children || [];
+
+  // 判断：如果有子消息，只清空内容；如果没有子消息，删除整个消息和分支
+  if (children.length > 0) {
+    // 情况1：有子消息，只清空内容为换行符
+    message.content = "\n";
+    await saveConv(conv);
+    await renderMessages();
+  } else {
+    // 情况2：没有子消息，删除整个消息
+
+    // 检查这个消息是否是某个分支的 firstMessageId
+    let branchNodeToUpdate = null;
+    let branchIndexToDelete = -1;
+
+    if (parentId) {
+      const branchNode = findBranchNodeByParent(conv, parentId);
+      if (branchNode) {
+        // 找到该消息在分支节点中的位置
+        branchIndexToDelete = branchNode.branches.findIndex(b => b.firstMessageId === messageId);
+        if (branchIndexToDelete !== -1) {
+          branchNodeToUpdate = branchNode;
+        }
+      }
+    }
+
+    // 从父消息的children中移除
+    if (parentId && conv.messages[parentId]) {
+      const parent = conv.messages[parentId];
+      parent.children = parent.children.filter(id => id !== messageId);
+    }
+
+    // 删除消息对象
+    delete conv.messages[messageId];
+
+    // 如果是分支的一部分，从分支节点中删除该分支
+    if (branchNodeToUpdate && branchIndexToDelete !== -1) {
+      branchNodeToUpdate.branches.splice(branchIndexToDelete, 1);
+
+      // 如果当前激活的分支被删除，切换到其他分支
+      if (branchNodeToUpdate.activeChildId === messageId) {
+        if (branchNodeToUpdate.branches.length > 0) {
+          // 切换到前一个分支，如果是第一个则切换到下一个
+          const newIndex = branchIndexToDelete > 0 ? branchIndexToDelete - 1 : 0;
+          branchNodeToUpdate.activeChildId = branchNodeToUpdate.branches[newIndex].firstMessageId;
+        } else {
+          // 没有分支了，删除分支节点
+          delete conv.branchNodes[branchNodeToUpdate.id];
+        }
+      }
+
+      // 如果只剩1个分支，删除分支节点
+      if (branchNodeToUpdate.branches.length === 1) {
+        delete conv.branchNodes[branchNodeToUpdate.id];
+      }
+    }
+
+    await saveConv(conv);
+    await renderMessages();
+  }
+}
+
+/**
+ * 重试消息（树状结构 - AI消息）
+ */
+async function retryMessage(btn) {
+  if (isGenerating) return;
+  const row = btn.closest('.message-row');
+  const messageId = row.dataset.messageId;
+  if (!messageId) return;
+
+  const convs = await getConvs();
+  const conv = convs.find(c => c.id === currentConvId);
+  if (!conv || !conv.messages[messageId]) return;
+
+  const message = conv.messages[messageId];
+  const isUserMessage = message.role === 'user';
+
+  if (isUserMessage) {
+    // 用户消息的重试：在该用户消息下创建分支节点，生成新的AI回复
+    // 检查是否已存在分支节点
+    let branchNode = findBranchNodeByParent(conv, messageId);
+
+    if (!branchNode) {
+      // 查找当前用户消息的第一个AI子消息（如果有）
+      const firstAIChild = message.children.length > 0 ? message.children[0] : null;
+
+      // 创建新的分支节点
+      branchNode = {
+        id: generateId16(),
+        parentId: messageId,
+        branches: firstAIChild ? [
+          {
+            id: generateId16(),
+            firstMessageId: firstAIChild,
+            order: 0
+          }
+        ] : [],
+        activeChildId: firstAIChild
+      };
+      conv.branchNodes[branchNode.id] = branchNode;
+    }
+
+    // 创建新的AI消息（新分支）
+    const newAIMessageId = generateId16();
+    const newAIMessage = {
+      id: newAIMessageId,
+      role: 'assistant',
+      content: '\n',  // 初始显示换行符
+      parentId: messageId,
+      children: [],
+      timestamp: Date.now()
+    };
+
+    conv.messages[newAIMessageId] = newAIMessage;
+
+    // 添加到分支节点
+    branchNode.branches.push({
+      id: generateId16(),
+      firstMessageId: newAIMessageId,
+      order: branchNode.branches.length
+    });
+
+    // 更新activeChildId
+    branchNode.activeChildId = newAIMessageId;
+
+    // 更新用户消息的children
+    if (!message.children.includes(newAIMessageId)) {
+      message.children.push(newAIMessageId);
+    }
+
+    // 保存并重新渲染
+    await saveConv(conv);
+    await renderMessages();
+
+    // 发送API请求生成新回复
+    await sendMessageToTree(message.content, newAIMessageId);
+
+  } else {
+    // AI消息的重试：在父消息下创建分支节点，生成新的AI回复
+    const parentId = message.parentId;
+
+    if (!parentId || !conv.messages[parentId]) return;
+
+    const parentMessage = conv.messages[parentId];
+
+    // 找到父消息对应的用户消息
+    let userMessage = parentMessage;
+    if (userMessage.role !== 'user') {
+      // 如果父消息不是用户消息，继续向上查找
+      let currentId = parentId;
+      while (currentId) {
+        const msg = conv.messages[currentId];
+        if (!msg) break;
+        if (msg.role === 'user') {
+          userMessage = msg;
+          break;
+        }
+        currentId = msg.parentId;
+      }
+    }
+
+    if (userMessage.role !== 'user') return;
+
+    // 检查是否已存在分支节点
+    let branchNode = findBranchNodeByParent(conv, parentId);
+
+    if (!branchNode) {
+      // 创建新的分支节点
+      branchNode = {
+        id: generateId16(),
+        parentId: parentId,
+        branches: [
+          {
+            id: generateId16(),
+            firstMessageId: messageId,
+            order: 0
+          }
+        ],
+        activeChildId: messageId
+      };
+      conv.branchNodes[branchNode.id] = branchNode;
+
+      // 更新父消息的children（如果还没有）
+      if (!parentMessage.children.includes(messageId)) {
+        parentMessage.children.push(messageId);
+      }
+    }
+
+    // 创建新的AI消息（新分支）
+    const newAIMessageId = generateId16();
+    const newAIMessage = {
+      id: newAIMessageId,
+      role: 'assistant',
+      content: '\n',  // 初始显示换行符
+      parentId: parentId,
+      children: [],
+      timestamp: Date.now()
+    };
+
+    conv.messages[newAIMessageId] = newAIMessage;
+
+    // 添加到分支节点
+    branchNode.branches.push({
+      id: generateId16(),
+      firstMessageId: newAIMessageId,
+      order: branchNode.branches.length
+    });
+
+    // 更新activeChildId
+    branchNode.activeChildId = newAIMessageId;
+
+    // 更新父消息的children
+    if (!parentMessage.children.includes(newAIMessageId)) {
+      parentMessage.children.push(newAIMessageId);
+    }
+
+    // 保存并重新渲染
+    await saveConv(conv);
+    await renderMessages();
+
+    // 发送API请求生成新回复
+    await sendMessageToTree(userMessage.content, newAIMessageId);
+  }
+}
+
+/**
+ * 编辑消息（树状结构）
+ */
+function editMessage(btn) {
+  if (isGenerating) return;
+  const row = btn.closest('.message-row');
+  const content = row.querySelector('.bubble-content');
+  const actions = row.querySelector('.bubble-actions');
+  const branchManager = row.querySelector('.branch-manager');
+  const originalText = content.textContent.trim();
+
+  // 判断是否为用户消息
+  const isUserMessage = row.classList.contains('user-row');
+
+  const wrap = document.createElement('div');
+  wrap.className = 'bubble-edit-wrap';
+
+  // AI消息只显示"取消"和"保存"，用户消息显示"取消"、"保存"和"保存并重新生成"
+  const buttons = isUserMessage
+    ? `<button class="bubble-edit-btn cancel">取消</button>
+       <button class="bubble-edit-btn save">保存</button>
+       <button class="bubble-edit-btn regen">保存并重新生成</button>`
+    : `<button class="bubble-edit-btn cancel">取消</button>
+       <button class="bubble-edit-btn save">保存</button>`;
+
+  wrap.innerHTML = `
+    <textarea class="bubble-edit-textarea">${escapeHtml(originalText)}</textarea>
+    <div class="bubble-edit-btns">
+      ${buttons}
+    </div>`;
+
+  content.replaceWith(wrap);
+  actions.style.display = 'none';
+  if (branchManager) branchManager.style.display = 'none';
+
+  const textarea = wrap.querySelector('textarea');
+  textarea.focus();
+  textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+
+  wrap.querySelector('.cancel').onclick = () => {
+    wrap.replaceWith(content);
+    actions.style.display = '';
+    if (branchManager) branchManager.style.display = '';
+  };
+
+  wrap.querySelector('.save').onclick = async () => {
+    const newText = textarea.value.trim();
+    if (!newText) return;
+
+    const messageId = row.dataset.messageId;
+    if (!messageId) return;
+
+    const convs = await getConvs();
+    const conv = convs.find(c => c.id === currentConvId);
+    if (!conv || !conv.messages[messageId]) return;
+
+    conv.messages[messageId].content = newText;
+    await saveConv(conv);
+
+    content.innerHTML = renderMd(newText);
+    wrap.replaceWith(content);
+    actions.style.display = '';
+    if (branchManager) branchManager.style.display = '';
+  };
+
+  // 只有用户消息才有"保存并重新生成"按钮
+  const regenBtn = wrap.querySelector('.regen');
+  if (regenBtn) {
+    regenBtn.onclick = async () => {
+      const newText = textarea.value.trim();
+      if (!newText) return;
+
+      const messageId = row.dataset.messageId;
+      if (!messageId) return;
+
+      const convs = await getConvs();
+      const conv = convs.find(c => c.id === currentConvId);
+      if (!conv || !conv.messages[messageId]) return;
+
+      const message = conv.messages[messageId];
+      const parentId = message.parentId;
+
+      if (!parentId) return;
+
+      // 在该消息前创建分支节点
+      let branchNode = findBranchNodeByParent(conv, parentId);
+
+      if (!branchNode) {
+        // 创建新的分支节点
+        branchNode = {
+          id: generateId16(),
+          parentId: parentId,
+          branches: [
+            {
+              id: generateId16(),
+              firstMessageId: messageId,
+              order: 0
+            }
+          ],
+          activeChildId: messageId
+        };
+        conv.branchNodes[branchNode.id] = branchNode;
+      }
+
+      // 创建新的用户消息（新分支）
+      const newUserMessageId = generateId16();
+      const newUserMessage = {
+        id: newUserMessageId,
+        role: message.role,
+        content: newText,
+        parentId: parentId,
+        children: [],
+        timestamp: Date.now()
+      };
+
+      conv.messages[newUserMessageId] = newUserMessage;
+
+      // 添加到分支节点
+      branchNode.branches.push({
+        id: generateId16(),
+        firstMessageId: newUserMessageId,
+        order: branchNode.branches.length
+      });
+
+      // 更新activeChildId
+      branchNode.activeChildId = newUserMessageId;
+
+      // 更新父消息的children
+      const parentMessage = conv.messages[parentId];
+      if (!parentMessage.children.includes(newUserMessageId)) {
+        parentMessage.children.push(newUserMessageId);
+      }
+
+      // 保存并重新渲染
+      await saveConv(conv);
+      await renderMessages();
+
+      // 如果是用户消息，生成AI回复
+      if (message.role === 'user') {
+        const newAIMessageId = generateId16();
+        const newAIMessage = {
+          id: newAIMessageId,
+          role: 'assistant',
+          content: '\n',  // 初始显示换行符
+          parentId: newUserMessageId,
+          children: [],
+          timestamp: Date.now()
+        };
+
+        conv.messages[newAIMessageId] = newAIMessage;
+        newUserMessage.children.push(newAIMessageId);
+
+        await saveConv(conv);
+        await renderMessages();
+
+        // 发送API请求
+        await sendMessageToTree(newText, newAIMessageId);
+      }
+    };
+  }
+}
+
+/**
+ * 切换分支
+ */
+async function switchBranch(nodeId, direction) {
+  const convs = await getConvs();
+  const conv = convs.find(c => c.id === currentConvId);
+  if (!conv || !conv.branchNodes[nodeId]) return;
+
+  const branchNode = conv.branchNodes[nodeId];
+  const currentIndex = branchNode.branches.findIndex(b => b.firstMessageId === branchNode.activeChildId);
+
+  if (currentIndex === -1) return;
+
+  const newIndex = currentIndex + direction;
+  if (newIndex < 0 || newIndex >= branchNode.branches.length) return;
+
+  // 更新activeChildId
+  branchNode.activeChildId = branchNode.branches[newIndex].firstMessageId;
+
+  // 保存并重新渲染
+  await saveConv(conv);
+  await renderMessages();
+}
+
+/**
+ * 删除分支
+ */
+async function deleteBranch(nodeId) {
+  if (isGenerating) return;
+
+  const convs = await getConvs();
+  const conv = convs.find(c => c.id === currentConvId);
+  if (!conv || !conv.branchNodes[nodeId]) return;
+
+  const branchNode = conv.branchNodes[nodeId];
+  const currentIndex = branchNode.branches.findIndex(b => b.firstMessageId === branchNode.activeChildId);
+
+  if (currentIndex === -1) return;
+
+  // 删除当前分支下的所有消息
+  const branchToDelete = branchNode.branches[currentIndex];
+  const deleteMessagesRecursive = (msgId) => {
+    const msg = conv.messages[msgId];
+    if (!msg) return;
+
+    // 递归删除子消息
+    if (msg.children) {
+      msg.children.forEach(childId => deleteMessagesRecursive(childId));
+    }
+
+    // 删除消息
+    delete conv.messages[msgId];
+  };
+
+  deleteMessagesRecursive(branchToDelete.firstMessageId);
+
+  // 从分支节点中移除该分支
+  branchNode.branches.splice(currentIndex, 1);
+
+  // 如果只剩一个分支，删除分支节点
+  if (branchNode.branches.length === 1) {
+    const remainingBranch = branchNode.branches[0];
+    const parentMessage = conv.messages[branchNode.parentId];
+
+    if (parentMessage) {
+      // 将唯一分支的消息直接连接到父消息
+      parentMessage.children = [remainingBranch.firstMessageId];
+
+      const remainingMessage = conv.messages[remainingBranch.firstMessageId];
+      if (remainingMessage) {
+        remainingMessage.parentId = branchNode.parentId;
+      }
+    }
+
+    // 删除分支节点
+    delete conv.branchNodes[nodeId];
+  } else {
+    // 切换到前一个分支（或后一个）
+    const newIndex = currentIndex > 0 ? currentIndex - 1 : 0;
+    branchNode.activeChildId = branchNode.branches[newIndex].firstMessageId;
+  }
+
+  // 保存并重新渲染
+  await saveConv(conv);
+  await renderMessages();
+}
 
 function setGenerating(on) {
   isGenerating = on;
@@ -1197,20 +2645,46 @@ function setStatus(s,t) {
   g('status-text').textContent=t||s;
 }
 
-function clearCurrentChat() {
+async function clearCurrentChat() {
   if(isGenerating) return showToast('请先停止生成');
-  currentMessages = [];
-  saveCurrentConv();
+
+  const convs = await getConvs();
+  const conv = convs.find(c => c.id === currentConvId);
+  if (!conv) return;
+
+  // 只保留系统消息
+  const systemMsgId = conv.rootMessageId;
+  const systemMsg = conv.messages[systemMsgId];
+
+  if (systemMsg) {
+    systemMsg.children = [];
+    conv.messages = { [systemMsgId]: systemMsg };
+    conv.branchNodes = {};
+  }
+
+  await saveConv(conv);
   renderMessages();
-  updateStats();
   showToast('对话已清空');
 }
 
-function updateStats() {
-  const msgs = currentMessages.filter(m=>m.role!=='system');
-  g('msg-count').textContent = msgs.length;
-  const total = currentMessages.reduce((a,m)=>a+m.content.length,0);
-  g('char-total').textContent = total>9999?(total/1000).toFixed(1)+'k':total;
+async function updateStats() {
+  if (!currentConvId) {
+    g('msg-count').textContent = 0;
+    g('char-total').textContent = 0;
+    return;
+  }
+
+  const convs = await getConvs();
+  const conv = convs.find(c => c.id === currentConvId);
+  if (!conv) return;
+
+  const { messages } = buildRenderPath(conv);
+  const nonSystemMsgs = messages.filter(m => m.role !== 'system');
+
+  g('msg-count').textContent = nonSystemMsgs.length;
+
+  const total = messages.reduce((a, m) => a + m.content.length, 0);
+  g('char-total').textContent = total > 9999 ? (total / 1000).toFixed(1) + 'k' : total;
 }
 
 function updateCharCount(){ g('char-count').textContent=g('user-input').value.length; }
@@ -1301,7 +2775,7 @@ function toggleOpt(key) {
   const savedId = await getData('A');
   if(convs.length>0){
     const target = savedId ? convs.find(c=>c.id===savedId) : convs[0];
-    if(target){ currentConvId=target.id; currentMessages=target.messages||[]; }
+    if(target){ currentConvId=target.id; }
     else await newChat(false);
   } else { await newChat(false); }
   renderMessages(); renderConvList(); updateStats(); scrollToBottom();
