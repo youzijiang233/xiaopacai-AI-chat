@@ -1629,6 +1629,7 @@ async function sendMessage(retryText = null, isRetry = false) {
   // 保存当前对话
   await saveConv(conv);
   await renderMessages();
+  scrollToBottom();
 
   if (!isRetry) {
     input.value = '';
@@ -2157,7 +2158,6 @@ function appendBubble(role, text, empty=false, messageId=null, branchNode=null) 
       ${actions}
     </div>`;
   g('messages').appendChild(row);
-  scrollToBottom();
   return row;
 }
 
